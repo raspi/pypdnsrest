@@ -126,10 +126,9 @@ class PowerDnsRestApiClient:
             "nameservers": nameservers,
         }
 
-        log.debug("Adding zone '{0}'".format(name))
         req = self._req_post("zones", data=json.dumps(zone))
 
-        if req.status_code > 400:
+        if req.status_code >= 400:
             raise PowerDnsRestApiException(req.content)
 
         return req
