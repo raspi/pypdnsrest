@@ -156,12 +156,16 @@ class PowerDnsRestApiClient:
                     self.add_parser(inst)
 
         if len(self.get_parsers()) == 0:
-            raise ImportError("Couldn't load default classes")
+            raise ImportError("Couldn't load default parsers")
 
         return True
 
     def get_zone(self, name: str):
         zonereq = self._req_get("zones/{0}".format(name))
+
+        if zonereq.status_code >= 400:
+            raise DNSZoneInvalidException(zonereq.content)
+
         zonedata = json.loads(zonereq.content.decode('utf8'))
 
         from pypdnsrest.dnszone import DNSZone
