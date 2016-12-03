@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.org/raspi/pypdnsrest.svg?branch=master)](https://travis-ci.org/raspi/pypdnsrest)
+[![Code Climate](https://codeclimate.com/github/raspi/pypdnsrest/badges/gpa.svg)](https://codeclimate.com/github/raspi/pypdnsrest)
+[![Test Coverage](https://codeclimate.com/github/raspi/pypdnsrest/badges/coverage.svg)](https://codeclimate.com/github/raspi/pypdnsrest/coverage)
+[![Issue Count](https://codeclimate.com/github/raspi/pypdnsrest/badges/issue_count.svg)](https://codeclimate.com/github/raspi/pypdnsrest)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/26121d282a5746c8a4d4b8468aa55969)](https://www.codacy.com/app/raspi/pypdnsrest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=raspi/pypdnsrest&amp;utm_campaign=Badge_Grade)
+
 PowerDNS HTTP REST API Python client
  
 https://doc.powerdns.com/md/httpapi/README/
