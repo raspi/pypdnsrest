@@ -1,5 +1,7 @@
+dist: trusty
+sudo: required
+
 language: python
-sudo: false
 
 cache:
     pip: true
@@ -9,6 +11,10 @@ cache:
 
 before_cache:
     - rm -f $HOME/.cache/pip/log/debug.log
+
+before_script:
+    - sudo apt-get -qq update
+    - sudo apt-get -qq -y install pdns-backend-sqlite3
 
 matrix:
     include:
