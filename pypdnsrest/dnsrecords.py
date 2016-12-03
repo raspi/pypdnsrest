@@ -12,7 +12,7 @@ class InvalidDNSRecordException(ValueError):
 class DNSRecordMainBase:
     record_ttl = timedelta(hours=1)
 
-    def set_data(self, data):
+    def set_data(self, data, *args, **kwargs):
         raise NotImplementedError("Not implemented")
 
     def validate(self):
@@ -37,7 +37,7 @@ class DNSRecordBase(DNSRecordMainBase):
     def get_record(self):
         return {'ttl': self.record_ttl, 'type': self.record_type, 'data': self.record_data, 'name': self.record_name}
 
-    def set_data(self):
+    def set_data(self, *args, **kwargs):
         raise NotImplementedError("Not implemented")
 
     def validate(self):
