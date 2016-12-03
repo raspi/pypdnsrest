@@ -190,7 +190,7 @@ class PowerDnsRestApiClient:
 
         raise DNSZoneInvalidException("Invalid zone.")
 
-    def _generate_record(self, rectype:str, name:str, data:str, ttl:int):
+    def _generate_record(self, rectype: str, name: str, data: str, ttl: int):
         return {"rrsets": [{
             "name": name,
             "type": rectype,
@@ -211,7 +211,8 @@ class PowerDnsRestApiClient:
         if not record.validate():
             raise InvalidDNSRecordException("Invalid record.")
 
-        rec = self._generate_record(record.record_type, record.record_name, str(record.record_data), int(record.record_ttl.total_seconds()))
+        rec = self._generate_record(record.record_type, record.record_name, str(record.record_data),
+                                    int(record.record_ttl.total_seconds()))
 
         req = self._req_patch("zones/{0}".format(zone), data=json.dumps(rec))
 
