@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+import logging
+
+log = logging.getLogger(__name__)
 
 from pypdnsrest.dnsrecords import DNSNsRecord
 from pypdnsrest.dnsrecords import DNSRecordMainBase
@@ -19,29 +22,31 @@ class DNSZoneBase:
 
 
 class DNSZone(DNSZoneBase):
-    records = []
+    _records = []
 
     def add_record(self, record: DNSRecordMainBase):
 
         if not isinstance(record, DNSRecordMainBase):
-            raise InvalidDNSRecordException()
+            raise InvalidDNSRecordException("Invalid record type")
 
         if record.validate():
-            self.records.append(record)
+            self._records.append(record)
+            log.debug("Added: {0}".format(record))
         else:
             raise InvalidDNSRecordException("Invalid record")
 
     def get_records(self):
-        return self.records
+        return self._records
 
     def validate(self):
-        if len(self.records) == 0:
+        recs = self.get_records()
+        if len(recs) == 0:
             return False
 
         has_soa = False
         nameserver_count = 0
 
-        for rec in self.get_records():
+        for rec in recs:
             if isinstance(rec, DNSSoaRecord):
                 has_soa = True
             elif isinstance(rec, DNSNsRecord):
@@ -53,5 +58,7 @@ class DNSZone(DNSZoneBase):
         return False
 
     def __str__(self):
+        o = ""
         for i in self.get_records():
-            return "{0}".format(i)
+            o += u"{0}\n".format(i)
+        return o
