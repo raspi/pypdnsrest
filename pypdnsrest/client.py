@@ -3,6 +3,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+from pprint import pprint
 import json
 
 from requests import Session
@@ -12,6 +13,7 @@ from pypdnsrest.dnsrecords import DNSRecordMainBase
 from pypdnsrest.dnsrecords import InvalidDNSRecordException
 
 from pypdnsrest.dnszone import DNSZoneInvalidException
+from pypdnsrest.dnszone import DNSZone
 
 from pypdnsrest.parsers import RecordParser
 
@@ -47,6 +49,7 @@ class PowerDnsRestApiClient:
         self._path = path
         self._apikey = apikey
         self.c = Session()
+
         self.c.hooks = {
             'response': self._hook_response,
         }
@@ -55,16 +58,49 @@ class PowerDnsRestApiClient:
         req = response.request
         str = "\n-- REQUEST:\n"
         str += "{0} {1}\n".format(req.method, req.url)
-        str += "{0}\n{1}\n".format(req.headers, req.body)
+        str += "{0}\n".format(pprint(req.headers))
+
+        body = req.body
+
+        try:
+            body = json.dumps(json.loads(body), indent=4)
+        except:
+            pass
+
+        str += "{0}\n".format(body)
 
         str += "\n-- RESPONSE ({0}):\n".format(response.status_code)
-        str += "{0}\n".format(response.headers)
-        str += "{0}\n".format(response.content)
+        str += "{0}\n".format(pprint(response.headers))
+
+        jsondata = None
+
+        try:
+            jsondata = response.json()
+        except:
+            pass
+
+        if jsondata is not None:
+            str += "{0}\n".format(json.dumps(jsondata, indent=4))
+        else:
+            str += "{0}\n".format(response.content)
+
         str += "\n"
 
         log.debug(str)
 
-    def _get_ses(self, url, data=None):
+        if response.status_code >= 400:
+            try:
+                err = json.dumps(response.json(), indent=4)
+            except:
+                err = getattr(response, "content", None)
+
+            if err is None:
+                err = response.raw
+
+            raise PowerDnsRestApiException(err)
+
+
+    def _get_ses(self, url, data=None) -> dict:
         headers = {
             'X-API-Key': self._apikey,
         }
@@ -79,7 +115,8 @@ class PowerDnsRestApiClient:
 
         return o
 
-    def _req_get(self, url):
+
+    def _req_get(self, url) -> Response:
         """
         GET
         :param url:
@@ -89,9 +126,10 @@ class PowerDnsRestApiClient:
         s = self._get_ses(url)
 
         r = self.c.get(s['url'], headers=s['headers'])
+
         return r
 
-    def _req_post(self, url, data=None):
+    def _req_post(self, url, data=None) -> Response:
         """
         POST
         :param url:
@@ -103,7 +141,7 @@ class PowerDnsRestApiClient:
         r = self.c.post(s['url'], headers=s['headers'], data=s['data'])
         return r
 
-    def _req_patch(self, url, data=None):
+    def _req_patch(self, url, data=None) -> Response:
         """
         PATCH
         :param url:
@@ -115,22 +153,32 @@ class PowerDnsRestApiClient:
         r = self.c.patch(s['url'], headers=s['headers'], data=s['data'])
         return r
 
-    def get_zones(self):
-        zones = self._req_get("zones")
-        z = json.loads(zones.content.decode('utf8'))
-        return z
+    def _req_delete(self, url) -> Response:
+        """
+        DELETE
+        :param url:
+        :return:
+        """
+
+        s = self._get_ses(url)
+        r = self.c.delete(s['url'], headers=s['headers'])
+        return r
+
+
+    def get_zones(self) -> str:
+        return self._req_get("zones").json()
 
     def add_zone(self, name: str, nameservers: list):
 
         if not isinstance(nameservers, list):
-            raise Exception("Wrong type. List was excepted.")
+            raise ValueError("Wrong type. List was excepted.")
 
         if len(nameservers) == 0:
-            raise Exception("No name server(s) listed.")
+            raise ValueError("No name server(s) listed.")
 
         for i in nameservers:
             if i is None or i is "":
-                raise Exception("Empty name server given")
+                raise ValueError("Empty name server given")
 
         zone = {
             "name": name,
@@ -141,10 +189,7 @@ class PowerDnsRestApiClient:
 
         req = self._req_post("zones", data=json.dumps(zone))
 
-        if req.status_code >= 400:
-            raise PowerDnsRestApiException(req.content)
-
-        return req
+        return True
 
     def add_parser(self, parser: RecordParser):
         if not isinstance(parser, RecordParser):
@@ -154,7 +199,7 @@ class PowerDnsRestApiClient:
             self._rec_parsers.append(parser)
         return True
 
-    def get_parsers(self):
+    def get_parsers(self) -> list:
         return self._rec_parsers
 
     def _load_default_parsers(self):
@@ -162,6 +207,8 @@ class PowerDnsRestApiClient:
         import pypdnsrest.parsers
 
         for name, obj in inspect.getmembers(pypdnsrest.parsers):
+            if name.lower().find("RecordParser".lower()) == -1:
+                continue
             if inspect.isclass(obj) and not inspect.isbuiltin(obj) and object not in obj.__bases__:
                 inst = obj()
                 if isinstance(inst, RecordParser):
@@ -172,15 +219,13 @@ class PowerDnsRestApiClient:
 
         return True
 
-    def get_zone(self, name: str):
-        zonereq = self._req_get("zones/{0}".format(name))
+    def _get_zone_json(self, name: str) -> str:
+        return self._req_get("zones/{0}".format(name)).json()
 
-        if zonereq.status_code >= 400:
-            raise DNSZoneInvalidException(zonereq.content)
 
-        zonedata = json.loads(zonereq.content.decode('utf8'))
+    def get_zone(self, name: str) -> DNSZone:
 
-        from pypdnsrest.dnszone import DNSZone
+        zonedata = self._get_zone_json(name)
 
         o = DNSZone()
 
@@ -191,38 +236,45 @@ class PowerDnsRestApiClient:
 
             parsername = "{0}RecordParser".format(i['type'].title())
 
-            try:
-                for parser in self.get_parsers():
-                    if type(parser).__name__ == parsername:
-                        o.add_record(parser.parse(i))
-            except Exception as exc:
-                log.warning("Parser error: %s", exc)
+            for recs in i['records']:
+                try:
+                    for parser in self.get_parsers():
+                        if type(parser).__name__.lower() == parsername.lower():
+                            o.add_record(parser.parse(i['name'], recs, i['ttl']))
+                except Exception as exc:
+                    log.warning("Parser error: %s", exc)
 
         if o.validate():
             return o
 
         raise DNSZoneInvalidException("Invalid zone.")
 
-    def _generate_record(self, rectype: str, name: str, data: str, ttl: int, changetype:str="REPLACE"):
+    def del_zone(self, zone:str):
+        r = self._req_delete("zones/{0}".format(zone))
+        return True
+
+
+    def _generate_record(self, record:dict, changetype:str="REPLACE") -> dict:
         if changetype.lower() not in ['replace', 'delete']:
-            raise ValueError("Invalid value for changetype: '{0}'".format(changetype))
+            raise ValueError("Invalid value for changetype: '{0}'.".format(changetype))
 
         rec =  {"rrsets": [{
-            "name": name,
-            "type": rectype,
+            "name": record['name'],
+            "type": record['type'],
             "changetype": changetype.upper(),
             "records": [
                 {
-                    "content": data,
+                    "content": record['data'],
                     "disabled": False,
                 },
             ],
         }, ], }
 
         if changetype.lower() is not 'delete':
-            rec['rrsets'][0]["ttl"] = ttl
+            rec['rrsets'][0]["ttl"] = record['ttl']
 
         return rec
+
 
     def del_record(self, zone:str, record:DNSRecordMainBase):
         if not isinstance(record, DNSRecordMainBase):
@@ -231,13 +283,9 @@ class PowerDnsRestApiClient:
         if not record.validate():
             raise InvalidDNSRecordException("Invalid record.")
 
-        rec = self._generate_record(record.record_type, record.record_name, str(record.record_data),
-                                    0, 'delete')
+        rec = self._generate_record(record.get_record(), 'delete')
 
         req = self._req_patch("zones/{0}".format(zone), data=json.dumps(rec))
-
-        if req.status_code >= 400:
-            raise PowerDnsRestApiException(req.content)
 
         return req
 
@@ -248,12 +296,21 @@ class PowerDnsRestApiClient:
         if not record.validate():
             raise InvalidDNSRecordException("Invalid record.")
 
-        rec = self._generate_record(record.record_type, record.record_name, str(record.record_data),
-                                    int(record.record_ttl.total_seconds()))
+        rrdata = record.get_record()
+        rec = self._generate_record(rrdata, 'replace')
 
-        req = self._req_patch("zones/{0}".format(zone), data=json.dumps(rec))
+        zonerrsets = self._get_zone_json(zone)['rrsets']
 
-        if req.status_code >= 400:
-            raise PowerDnsRestApiException(req.content)
+        for rrset in zonerrsets:
+            if rrset['type'].lower() == rec['rrsets'][0]['type'].lower() and rrset['name'] == rec['rrsets'][0]['name'].lower():
+                for i in rrset['records']:
+                    if i not in rec['rrsets'][0]['records']:
+                        rec['rrsets'][0]['records'].append(i)
 
-        return req
+        data = json.dumps(rec)
+
+        #print(json.dumps(json.loads(data), indent=4))
+
+        req = self._req_patch("zones/{0}".format(zone), data=data)
+
+        return True

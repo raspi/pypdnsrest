@@ -18,27 +18,27 @@ class DNSZoneInvalidException(DNSZoneException):
 
 
 class DNSZoneBase:
-    pass
+    _records = []
 
 
 class DNSZone(DNSZoneBase):
-    _records = []
 
-    def add_record(self, record: DNSRecordMainBase):
+    def add_record(self, record: DNSRecordMainBase) -> bool:
 
         if not isinstance(record, DNSRecordMainBase):
-            raise InvalidDNSRecordException("Invalid record type")
+            raise InvalidDNSRecordException(u"Invalid record type: {0}".format(type(record)))
 
         if record.validate():
             self._records.append(record)
-            log.debug("Added: {0}".format(record))
         else:
-            raise InvalidDNSRecordException("Invalid record")
+            raise InvalidDNSRecordException(u"Invalid record.")
 
-    def get_records(self):
+        return True
+
+    def get_records(self) -> list:
         return self._records
 
-    def validate(self):
+    def validate(self) -> bool:
         recs = self.get_records()
         if len(recs) == 0:
             return False
@@ -57,7 +57,7 @@ class DNSZone(DNSZoneBase):
 
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         o = ""
         for i in self.get_records():
             o += u"{0}\n".format(i)
