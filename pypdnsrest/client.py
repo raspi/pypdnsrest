@@ -25,6 +25,10 @@ class PowerDnsRestApiCall():
 
 
 class PowerDnsRestApiClient:
+    """
+    https://doc.powerdns.com/md/httpapi/api_spec/
+    """
+
     _host = None
     _port = None
     _apikey = None
