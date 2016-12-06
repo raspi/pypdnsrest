@@ -295,7 +295,8 @@ class PowerDnsRestApiClient:
         for rrset in zonerrsets:
             same_type = rrset['type'].lower() == rec['rrsets'][0]['type'].lower()
             same_name = rrset['name'] == rec['rrsets'][0]['name'].lower()
-            if  same_type and same_name:
+
+            if same_type and same_name:
                 for i in rrset['records']:
                     if i not in rec['rrsets'][0]['records']:
                         rec['rrsets'][0]['records'].append(i)
