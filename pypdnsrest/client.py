@@ -203,12 +203,14 @@ class PowerDnsRestApiClient:
 
         raise DNSZoneInvalidException("Invalid zone.")
 
-    def _generate_record(self, rectype: str, name: str, data: str, ttl: int):
-        return {"rrsets": [{
+    def _generate_record(self, rectype: str, name: str, data: str, ttl: int, changetype:str="REPLACE"):
+        if changetype.lower() not in ['replace', 'delete']:
+            raise ValueError("Invalid value for changetype: '{0}'".format(changetype))
+
+        rec =  {"rrsets": [{
             "name": name,
             "type": rectype,
-            "ttl": ttl,
-            "changetype": "REPLACE",
+            "changetype": changetype.upper(),
             "records": [
                 {
                     "content": data,
@@ -216,6 +218,28 @@ class PowerDnsRestApiClient:
                 },
             ],
         }, ], }
+
+        if changetype.lower() is not 'delete':
+            rec['rrsets'][0]["ttl"] = ttl
+
+        return rec
+
+    def del_record(self, zone:str, record:DNSRecordMainBase):
+        if not isinstance(record, DNSRecordMainBase):
+            raise InvalidDNSRecordException()
+
+        if not record.validate():
+            raise InvalidDNSRecordException("Invalid record.")
+
+        rec = self._generate_record(record.record_type, record.record_name, str(record.record_data),
+                                    0, 'delete')
+
+        req = self._req_patch("zones/{0}".format(zone), data=json.dumps(rec))
+
+        if req.status_code >= 400:
+            raise PowerDnsRestApiException(req.content)
+
+        return req
 
     def add_record(self, zone: str, record: DNSRecordMainBase):
         if not isinstance(record, DNSRecordMainBase):
