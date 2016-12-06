@@ -26,7 +26,8 @@ class DNSRecordMainBase:
         raise NotImplementedError("Not implemented")
 
     def get_record(self):
-        return {'ttl': int(self._ttl.total_seconds()), 'type': self._type, 'data': str(self._data), 'name': str(self._name)}
+        return {'ttl': int(self._ttl.total_seconds()), 'type': self._type, 'data': str(self._data),
+                'name': str(self._name)}
 
 
 class DNSRecordBase(DNSRecordMainBase):
@@ -43,7 +44,6 @@ class DNSRecordBase(DNSRecordMainBase):
     def __str__(self):
         return u"{0} {1} {2} {3}".format(str(self._name), int(self._ttl.total_seconds()), self._type,
                                          str(self._data))
-
 
     def set_data(self, *args, **kwargs) -> bool:
         raise NotImplementedError("Not implemented")
@@ -135,10 +135,11 @@ class DNSAaaaRecord(DNSRecordBase):
             return True
         return False
 
+
 class DNSNsRecord(DNSRecordBase):
     _type = u'NS'
 
-    def set_data(self, data: str)  -> bool:
+    def set_data(self, data: str) -> bool:
         self._data = data
 
         if not self.validate():

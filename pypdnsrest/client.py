@@ -99,7 +99,6 @@ class PowerDnsRestApiClient:
 
             raise PowerDnsRestApiException(err)
 
-
     def _get_ses(self, url, data=None) -> dict:
         headers = {
             'X-API-Key': self._apikey,
@@ -115,18 +114,14 @@ class PowerDnsRestApiClient:
 
         return o
 
-
     def _req_get(self, url) -> Response:
         """
         GET
         :param url:
         :return:
         """
-
         s = self._get_ses(url)
-
         r = self.c.get(s['url'], headers=s['headers'])
-
         return r
 
     def _req_post(self, url, data=None) -> Response:
@@ -163,7 +158,6 @@ class PowerDnsRestApiClient:
         s = self._get_ses(url)
         r = self.c.delete(s['url'], headers=s['headers'])
         return r
-
 
     def get_zones(self) -> str:
         return self._req_get("zones").json()
@@ -222,7 +216,6 @@ class PowerDnsRestApiClient:
     def _get_zone_json(self, name: str) -> str:
         return self._req_get("zones/{0}".format(name)).json()
 
-
     def get_zone(self, name: str) -> DNSZone:
 
         zonedata = self._get_zone_json(name)
@@ -249,16 +242,15 @@ class PowerDnsRestApiClient:
 
         raise DNSZoneInvalidException("Invalid zone.")
 
-    def del_zone(self, zone:str):
+    def del_zone(self, zone: str):
         r = self._req_delete("zones/{0}".format(zone))
         return True
 
-
-    def _generate_record(self, record:dict, changetype:str="REPLACE") -> dict:
+    def _generate_record(self, record: dict, changetype: str = "REPLACE") -> dict:
         if changetype.lower() not in ['replace', 'delete']:
             raise ValueError("Invalid value for changetype: '{0}'.".format(changetype))
 
-        rec =  {"rrsets": [{
+        rec = {"rrsets": [{
             "name": record['name'],
             "type": record['type'],
             "changetype": changetype.upper(),
@@ -275,8 +267,7 @@ class PowerDnsRestApiClient:
 
         return rec
 
-
-    def del_record(self, zone:str, record:DNSRecordMainBase):
+    def del_record(self, zone: str, record: DNSRecordMainBase):
         if not isinstance(record, DNSRecordMainBase):
             raise InvalidDNSRecordException()
 
@@ -302,14 +293,15 @@ class PowerDnsRestApiClient:
         zonerrsets = self._get_zone_json(zone)['rrsets']
 
         for rrset in zonerrsets:
-            if rrset['type'].lower() == rec['rrsets'][0]['type'].lower() and rrset['name'] == rec['rrsets'][0]['name'].lower():
+            if rrset['type'].lower() == rec['rrsets'][0]['type'].lower() and \
+                            rrset['name'] == rec['rrsets'][0]['name'].lower():
                 for i in rrset['records']:
                     if i not in rec['rrsets'][0]['records']:
                         rec['rrsets'][0]['records'].append(i)
 
         data = json.dumps(rec)
 
-        #print(json.dumps(json.loads(data), indent=4))
+        # print(json.dumps(json.loads(data), indent=4))
 
         req = self._req_patch("zones/{0}".format(zone), data=data)
 
