@@ -48,8 +48,16 @@ class PowerDnsRestApiClient:
         }
 
     def _hook_response(self, response: Response, *args, **kw):
-        log.debug("RESPONSE: {0} {1} {3}\n\t\t{2}".format(response.request.method, response.status_code, response.url,
-                                                          response.content))
+        str = "\n-- REQUEST:\n"
+        str += "{0} {1}\n".format(response.request.method, response.request.url)
+        str += "{0}\n{1}\n".format(response.request.headers, getattr(response.request, "data", ""))
+
+        str += "-- RESPONSE ({0}):\n".format(response.status_code)
+        str += "{0}\n".format(response.headers)
+        str += "{0}\n".format(response.content)
+        str += "\n"
+
+        log.debug(str)
 
     def _get_ses(self, url, data=None):
         headers = {
