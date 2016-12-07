@@ -55,20 +55,36 @@ class DNSRecordBase(DNSRecordMainBase):
 class DNSSoaRecordData(DNSRecordMainBase):
     _nameserver = None
     _email = None
-    _ttl = timedelta(hours=24)
     _serial = -1
+    _refresh = timedelta(hours=3)
+    _retry = timedelta(hours=1)
+    _expire = timedelta(days=7)
+    _ttl = timedelta(hours=24)
 
-    def __init__(self, nameserver: str, email: str, serial: int = -1, ttl: timedelta = timedelta(seconds=0)):
+    def __init__(self, nameserver: str, email: str, serial: int = -1, refresh: timedelta = timedelta(seconds=0),
+                 retry: timedelta = timedelta(seconds=0), expire: timedelta = timedelta(seconds=0),
+                 ttl: timedelta = timedelta(seconds=0)):
         self._nameserver = nameserver
         self._email = email
         self._serial = serial
+
+        if refresh.total_seconds() > 0:
+            self._refresh = refresh
+
+        if retry.total_seconds() > 0:
+            self._retry = retry
+
+        if expire.total_seconds() > 0:
+            self._expire = expire
 
         if ttl.total_seconds() > 0:
             self._ttl = ttl
 
     def __str__(self):
-        return u"{0} {1} {2} {3} {3} {3} {3}".format(self._nameserver, self._email, self._serial,
-                                                     int(self.record_ttl.total_seconds()))
+        return u"{0} {1} {2} {3} {4} {5} {6}".format(self._nameserver, self._email, self._serial,
+                                                     int(self._refresh.total_seconds()),
+                                                     int(self._retry.total_seconds()),
+                                                     int(self._expire.total_seconds()), int(self._ttl.total_seconds()))
 
     def validate(self) -> bool:
         if not isinstance(self._nameserver, str):

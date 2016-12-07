@@ -1,4 +1,8 @@
 # -*- coding: utf8 -*-
+"""
+Convert REST JSON dict to DNSRecordBase classes
+"""
+
 import logging
 
 log = logging.getLogger(__name__)
@@ -25,8 +29,9 @@ class SoaRecordParser(RecordParser):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
 
         tmp = data['content'].split(" ")
-        d = DNSSoaRecordData(nameserver=tmp[0], email=tmp[1], serial=int(tmp[2]),
-                             ttl=timedelta(seconds=ttl))
+        d = DNSSoaRecordData(nameserver=tmp[0], email=tmp[1], serial=int(tmp[2]), refresh=timedelta(seconds=tmp[3]),
+                             retry=timedelta(seconds=tmp[4]), expire=timedelta(seconds=tmp[4]),
+                             ttl=timedelta(seconds=tmp[5]))
         rec = DNSSoaRecord(name)
         rec.set_data(d)
         return rec
