@@ -90,16 +90,31 @@ class TestZone(unittest.TestCase):
     def test_valid(self):
         z = DNSZone()
 
+        # Add SOA
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+        rec = DNSSoaRecord(self.zone)
+        rec.set_data(soadata)
+        z.add_record(rec)
+
+        # Add NS
         from pypdnsrest.dnsrecords import DNSNsRecord
         rec = DNSNsRecord(self.zone)
         rec.set_data(u"ns1.{0}".format(self.zone))
         z.add_record(rec)
 
+        rec = DNSNsRecord(self.zone)
+        rec.set_data(u"ns2.{0}".format(self.zone))
+        z.add_record(rec)
+
+        # Add A
         from pypdnsrest.dnsrecords import DNSARecord
         from ipaddress import IPv4Address
-        z.add_record(rec)
 
         rec = DNSARecord(self.zone)
         rec.set_data(IPv4Address(u"192.168.0.1"))
+        z.add_record(rec)
 
         self.assertTrue(z.validate())

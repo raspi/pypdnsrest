@@ -17,8 +17,11 @@ class DNSZoneInvalidException(DNSZoneException):
     pass
 
 
-class DNSZoneBase:
+class DNSZoneBase():
     _records = []
+
+    def __init__(self):
+        self._records = []
 
     def get_records(self) -> list:
         return self._records
@@ -39,6 +42,7 @@ class DNSZone(DNSZoneBase):
 
     def validate(self) -> bool:
         recs = self.get_records()
+
         if len(recs) == 0:
             return False
 
