@@ -8,5 +8,9 @@ PowerDNS HTTP REST API Python client
  
 https://doc.powerdns.com/md/httpapi/README/
  
-## requirements
+## Requirements
+* Python 3.5+
 * requests
+
+## Run tests
+    python3.5 -m unittest discover -v pypdnsrest/tests/
