@@ -46,7 +46,7 @@ class TestZone(unittest.TestCase):
         z = DNSZone()
 
         rec = DNSNsRecord(self.zone)
-        rec.set_data("ns1.".format(self.zone))
+        rec.set_data("ns1.{0}".format(self.zone))
         self.assertTrue(z.add_record(rec))
 
     def test_add_soa_record(self):

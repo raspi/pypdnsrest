@@ -7,7 +7,10 @@ class TestApiRecords(unittest.TestCase):
     def setUp(self):
         self.api = PowerDnsRestApiClient("pdnsapi")
         self.zone = "{0}.zone.".format(type(self).__name__.lower())
-        self.nameservers = ["ns1.".format(self.zone), "ns2.".format(self.zone)]
+        self.nameservers = [
+            "ns1.{0}".format(self.zone),
+            "ns2.{0}".format(self.zone),
+        ]
         self.api.add_zone(self.zone, self.nameservers)
 
     def tearDown(self):
