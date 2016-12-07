@@ -37,7 +37,7 @@ before_script:
 
 before_install:
   - docker pull raspi/docker-powerdns-travis-ci-rest-test
-  - docker run raspi/docker-powerdns-travis-ci-rest-test
+  - docker run --detach raspi/docker-powerdns-travis-ci-rest-test
 
 install:
   - travis_retry pip install tox
