@@ -18,7 +18,7 @@ class RecordParser():
     def __init__(self, *args, **kwargs):
         pass
 
-    def parse(self, name: str = "", data: list = [], ttl: int = 0) -> DNSRecordBase:
+    def parse(self, name: str, data: list, ttl: int = 0) -> DNSRecordBase:
         raise NotImplementedError("Parser not implemented.")
 
 
