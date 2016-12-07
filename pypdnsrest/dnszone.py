@@ -23,8 +23,8 @@ class DNSZoneBase:
     def get_records(self) -> list:
         return self._records
 
-class DNSZone(DNSZoneBase):
 
+class DNSZone(DNSZoneBase):
     def add_record(self, record: DNSRecordMainBase) -> bool:
 
         if not isinstance(record, DNSRecordMainBase):

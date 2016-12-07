@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     logging.basicConfig(
         stream=sys.stdout,
-        #level=logging.DEBUG
+        # level=logging.DEBUG
     )
 
     from pypdnsrest.client import PowerDnsRestApiClient
@@ -36,8 +36,7 @@ if __name__ == "__main__":
             if isinstance(recdata, DNSSoaRecordData):
                 serial = recdata.get_data()['serial']
 
-
-    soadata = DNSSoaRecordData("ns1.{0}".format(zone), "admin.{0}".format(zone), serial+1)
+    soadata = DNSSoaRecordData("ns1.{0}".format(zone), "admin.{0}".format(zone), serial + 1)
     rec = DNSSoaRecord(zone)
     rec.set_data(soadata)
 
