@@ -5,12 +5,19 @@ from pypdnsrest.client import PowerDnsRestApiClient
 
 class TestApiRecords(unittest.TestCase):
     def setUp(self):
-        self.api = PowerDnsRestApiClient("pdnsapi")
-        self.zone = "{0}.zone.".format(type(self).__name__.lower())
+        self.api = PowerDnsRestApiClient(u"pdnsapi")
+        self.zone = u"{0}.zone.".format(type(self).__name__.lower())
         self.nameservers = [
-            "ns1.{0}".format(self.zone),
-            "ns2.{0}".format(self.zone),
+            u"ns1.{0}".format(self.zone),
+            u"ns2.{0}".format(self.zone),
         ]
+
+        try:
+            # It's possible that failed test left old zone remains
+            self.api.del_zone(self.zone)
+        except:
+            pass
+
         self.api.add_zone(self.zone, self.nameservers)
 
     def tearDown(self):
@@ -20,12 +27,12 @@ class TestApiRecords(unittest.TestCase):
         from ipaddress import IPv4Address
         from pypdnsrest.dnsrecords import DNSARecord
         rec = DNSARecord(self.zone)
-        rec.set_data(IPv4Address("192.168.101.1"))
+        rec.set_data(IPv4Address(u"192.168.101.1"))
         self.assertTrue(self.api.add_record(self.zone, rec))
 
     def test_create_record_aaaa(self):
         from ipaddress import IPv6Address
         from pypdnsrest.dnsrecords import DNSAaaaRecord
         rec = DNSAaaaRecord(self.zone)
-        rec.set_data(IPv6Address("fd00::"))
+        rec.set_data(IPv6Address(u"fd00::"))
         self.assertTrue(self.api.add_record(self.zone, rec))

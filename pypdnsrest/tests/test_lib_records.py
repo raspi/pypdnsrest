@@ -9,7 +9,7 @@ from pypdnsrest.dnsrecords import InvalidDNSRecordException
 
 class TestRecords(unittest.TestCase):
     def setUp(self):
-        self.zone = "{0}.zone.".format(type(self).__name__.lower())
+        self.zone = u"{0}.zone.".format(type(self).__name__.lower())
 
 
 class TestARecord(TestRecords):
@@ -17,7 +17,7 @@ class TestARecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSARecord
         from ipaddress import IPv4Address
         rec = DNSARecord(self.zone)
-        self.assertTrue(rec.set_data(IPv4Address("192.168.0.1")))
+        self.assertTrue(rec.set_data(IPv4Address(u"192.168.0.1")))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSARecord
@@ -37,13 +37,13 @@ class TestAaaaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSAaaaRecord
         from ipaddress import IPv6Address
         rec = DNSAaaaRecord(self.zone)
-        self.assertTrue(rec.set_data(IPv6Address("fd00::")))
+        self.assertTrue(rec.set_data(IPv6Address(u"fd00::")))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSAaaaRecord
         rec = DNSAaaaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
-            rec.set_data("")
+            rec.set_data(u"")
 
     def test_record_empty2(self):
         from pypdnsrest.dnsrecords import DNSAaaaRecord
@@ -56,7 +56,7 @@ class TestCnameRecord(TestRecords):
     def test_record(self):
         from pypdnsrest.dnsrecords import DNSCNameRecord
         rec = DNSCNameRecord(self.zone)
-        self.assertTrue(rec.set_data("test.test."))
+        self.assertTrue(rec.set_data(u"test.test."))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSCNameRecord
@@ -75,7 +75,7 @@ class TestNsRecord(TestRecords):
     def test_record(self):
         from pypdnsrest.dnsrecords import DNSNsRecord
         rec = DNSNsRecord(self.zone)
-        self.assertTrue(rec.set_data("test.test."))
+        self.assertTrue(rec.set_data(u"test.test."))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSNsRecord
@@ -95,7 +95,7 @@ class TestMxRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSMxRecord
         from pypdnsrest.dnsrecords import DNSMxRecordData
 
-        mxdata = DNSMxRecordData("mail.{0}".format(self.zone), 10)
+        mxdata = DNSMxRecordData(u"mail.{0}".format(self.zone), 10)
 
         rec = DNSMxRecord(self.zone)
         self.assertTrue(rec.set_data(mxdata))
@@ -104,7 +104,7 @@ class TestMxRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSMxRecord
         from pypdnsrest.dnsrecords import DNSMxRecordData
 
-        mxdata = DNSMxRecordData("mail.{0}".format(self.zone), -1)
+        mxdata = DNSMxRecordData(u"mail.{0}".format(self.zone), -1)
 
         rec = DNSMxRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -116,7 +116,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("ns1.{0}".format(self.zone), "admin.{0}".format(self.zone), 1)
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
 
         rec = DNSSoaRecord(self.zone)
         self.assertTrue(rec.set_data(soadata))
@@ -125,7 +125,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("", "admin.{0}".format(self.zone), 1)
+        soadata = DNSSoaRecordData("", u"admin.{0}".format(self.zone), 1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -135,7 +135,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData(None, "admin.{0}".format(self.zone), 1)
+        soadata = DNSSoaRecordData(None, u"admin.{0}".format(self.zone), 1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -145,7 +145,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("ns1.{0}".format(self.zone), "", 1)
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"", 1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -155,7 +155,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("ns1.{0}".format(self.zone), None, 1)
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), None, 1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -165,7 +165,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("ns1.{0}".format(self.zone), "test", 1)
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"test", 1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -175,7 +175,7 @@ class TestSoaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
 
-        soadata = DNSSoaRecordData("ns1.{0}".format(self.zone), "admin.{0}".format(self.zone), -1)
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), -1)
 
         rec = DNSSoaRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
@@ -187,13 +187,13 @@ class TestPtrRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSPtrRecord
         from ipaddress import IPv4Address
         rec = DNSPtrRecord(self.zone)
-        self.assertTrue(rec.set_data(IPv4Address("127.0.0.1")))
+        self.assertTrue(rec.set_data(IPv4Address(u"127.0.0.1")))
 
     def test_record_ipv6(self):
         from pypdnsrest.dnsrecords import DNSPtrRecord
         from ipaddress import IPv6Address
         rec = DNSPtrRecord(self.zone)
-        self.assertTrue(rec.set_data(IPv6Address("fd00::")))
+        self.assertTrue(rec.set_data(IPv6Address(u"fd00::")))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSPtrRecord
