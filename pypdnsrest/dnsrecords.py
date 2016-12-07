@@ -17,7 +17,7 @@ class DNSRecordMainBase:
         self._errors.append(err)
         return True
 
-    def _get_errors(self):
+    def _get_errors(self) -> list:
         return self._errors
 
     def set_data(self, data, *args, **kwargs) -> bool:
