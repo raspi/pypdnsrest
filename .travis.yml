@@ -16,26 +16,7 @@ before_script:
     - sudo apt-get -qq update
     - sudo apt-get -qq -y install pdns-backend-sqlite3
     - sudo /etc/init.d/pdns stop
-    - export PDNSCONF=/etc/powerdns/pdns.conf
-    - sudo echo "config-dir=/etc/powerdns" > $PDNSCONF
-    - sudo echo "master=yes" >> $PDNSCONF
-    - sudo echo "daemon=yes" >> $PDNSCONF
-    - sudo echo "disable-axfr=yes" >> $PDNSCONF
-    - sudo echo "guardian=yes" >> $PDNSCONF
-    - sudo echo "local-address=127.0.0.1" >> $PDNSCONF
-    - sudo echo "local-port=53" >> $PDNSCONF
-    - sudo echo "module-dir=/usr/lib/powerdns" >> $PDNSCONF
-    - sudo echo "setgid=pdns" >> $PDNSCONF
-    - sudo echo "setuid=pdns" >> $PDNSCONF
-    - sudo echo "socket-dir=/var/run" >> $PDNSCONF
-    - sudo echo "version-string=powerdns" >> $PDNSCONF
-    - sudo echo "include-dir=/etc/powerdns/pdns.d" >> $PDNSCONF
-    - sudo echo "webserver=yes" >> $PDNSCONF
-    - sudo echo "webserver-address=127.0.0.1" >> $PDNSCONF
-    - sudo echo "webserver-password=pdnsapi" >> $PDNSCONF
-    - sudo echo "webserver-port=8081" >> $PDNSCONF
-    - sudo cat $PDNSCONF
-    - sudo /etc/init.d/pdns start
+    - sudo pdns_server --help
 
 
 matrix:
