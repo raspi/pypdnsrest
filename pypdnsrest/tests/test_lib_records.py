@@ -171,7 +171,6 @@ class TestSoaRecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(soadata)
 
-
     def test_record_wrong_serial(self):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
         from pypdnsrest.dnsrecords import DNSSoaRecord
