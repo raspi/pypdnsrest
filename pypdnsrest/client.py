@@ -88,12 +88,12 @@ class PowerDnsRestApiClient:
         return o
 
     def _hook_response(self, response: Response, *args, **kw):
-        str = "\n{0}".format(self._request_to_str(response.request))
-        str += "\n{0}".format(self._response_to_str(response))
+        o = "\n{0}".format(self._request_to_str(response.request))
+        o += "\n{0}".format(self._response_to_str(response))
 
-        str += "\n"
+        o += "\n"
 
-        log.debug(str)
+        log.debug(o)
 
         if response.status_code >= 400:
             try:
