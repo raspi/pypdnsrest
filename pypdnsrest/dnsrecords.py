@@ -13,8 +13,9 @@ class DNSRecordMainBase:
     _errors = []
     _ttl = timedelta(hours=1)
 
-    def _add_error(self, err):
+    def _add_error(self, err) -> bool:
         self._errors.append(err)
+        return True
 
     def _get_errors(self):
         return self._errors
