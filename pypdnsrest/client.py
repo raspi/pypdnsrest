@@ -241,7 +241,7 @@ class PowerDnsRestApiClient:
                 try:
                     for parser in self.get_parsers():
                         if type(parser).__name__.lower() == parsername.lower():
-                            o.add_record(parser.parse(i['name'], recs, i['ttl']))
+                            o.add_record(parser.parse(i['name'], recs, int(i['ttl'])))
                 except Exception as exc:
                     log.warning(u"Parser error: {0}. Parser: {1}.".format(exc, type(parser).__name__))
 
