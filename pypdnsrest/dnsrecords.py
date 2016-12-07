@@ -25,9 +25,13 @@ class DNSRecordMainBase:
     def validate(self) -> bool:
         raise NotImplementedError("Not implemented")
 
-    def get_record(self):
-        return {'ttl': int(self._ttl.total_seconds()), 'type': self._type, 'data': str(self._data),
-                'name': str(self._name)}
+    def get_record(self) -> dict:
+        return {
+            'ttl': int(self._ttl.total_seconds()),
+            'type': self._type,
+            'data': str(self._data),
+            'name': str(self._name)
+        }
 
 
 class DNSRecordBase(DNSRecordMainBase):
@@ -51,71 +55,8 @@ class DNSRecordBase(DNSRecordMainBase):
     def validate(self) -> bool:
         raise NotImplementedError("Not implemented")
 
-
-class DNSSoaRecordData(DNSRecordMainBase):
-    _nameserver = None
-    _email = None
-    _serial = -1
-    _refresh = timedelta(hours=3)
-    _retry = timedelta(hours=1)
-    _expire = timedelta(days=7)
-    _ttl = timedelta(hours=24)
-
-    def __init__(self, nameserver: str, email: str, serial: int = -1, refresh: timedelta = timedelta(seconds=0),
-                 retry: timedelta = timedelta(seconds=0), expire: timedelta = timedelta(seconds=0),
-                 ttl: timedelta = timedelta(seconds=0)):
-        self._nameserver = nameserver
-        self._email = email
-        self._serial = serial
-
-        if refresh.total_seconds() > 0:
-            self._refresh = refresh
-
-        if retry.total_seconds() > 0:
-            self._retry = retry
-
-        if expire.total_seconds() > 0:
-            self._expire = expire
-
-        if ttl.total_seconds() > 0:
-            self._ttl = ttl
-
-    def __str__(self):
-        return u"{0} {1} {2} {3} {4} {5} {6}".format(self._nameserver, self._email, self._serial,
-                                                     int(self._refresh.total_seconds()),
-                                                     int(self._retry.total_seconds()),
-                                                     int(self._expire.total_seconds()), int(self._ttl.total_seconds()))
-
-    def validate(self) -> bool:
-        if not isinstance(self._nameserver, str):
-            self._add_error(u"Excepted 'nameserver' to be str.")
-            return False
-
-        if not isinstance(self._serial, int):
-            self._add_error(u"Excepted 'serial' to be int.")
-            return False
-
-        if not isinstance(self._email, str):
-            self._add_error(u"Excepted 'email' to be str.")
-            return False
-
-        if self._email.count('.') <= 2:
-            self._add_error(u"Email is missing dot(s) ('.').")
-            return False
-
-        if int(self._ttl.total_seconds()) <= 1:
-            self._add_error(u"Invalid TTL.")
-            return False
-
-        if self._serial <= 0:
-            self._add_error(u"Invalid serial.")
-            return False
-
-        if self._nameserver is None or self._nameserver == "":
-            self._add_error(u"Empty nameserver.")
-            return False
-
-        return True
+    def get_data(self):
+        return self._data
 
 
 class DNSARecord(DNSRecordBase):
@@ -201,6 +142,83 @@ class DNSCNameRecord(DNSRecordBase):
         return True
 
 
+class DNSSoaRecordData(DNSRecordMainBase):
+    _nameserver = None
+    _email = None
+    _serial = -1
+    _refresh = timedelta(hours=3)
+    _retry = timedelta(hours=1)
+    _expire = timedelta(days=7)
+    _ttl = timedelta(hours=24)
+
+    def __init__(self, nameserver: str, email: str, serial: int = -1, refresh: timedelta = timedelta(seconds=0),
+                 retry: timedelta = timedelta(seconds=0), expire: timedelta = timedelta(seconds=0),
+                 ttl: timedelta = timedelta(seconds=0)):
+        self._nameserver = nameserver
+        self._email = email
+        self._serial = serial
+
+        if refresh.total_seconds() > 0:
+            self._refresh = refresh
+
+        if retry.total_seconds() > 0:
+            self._retry = retry
+
+        if expire.total_seconds() > 0:
+            self._expire = expire
+
+        if ttl.total_seconds() > 0:
+            self._ttl = ttl
+
+    def __str__(self) -> str:
+        return u"{0} {1} {2} {3} {4} {5} {6}".format(self._nameserver, self._email, self._serial,
+                                                     int(self._refresh.total_seconds()),
+                                                     int(self._retry.total_seconds()),
+                                                     int(self._expire.total_seconds()), int(self._ttl.total_seconds()))
+
+    def get_data(self):
+        return {
+            'nameserver': self._nameserver,
+            'email': self._email,
+            'serial': self._serial,
+            'refresh': self._refresh,
+            'retry': self._retry,
+            'expire': self._expire,
+            'ttl': self._ttl,
+        }
+
+    def validate(self) -> bool:
+        if not isinstance(self._nameserver, str):
+            self._add_error(u"Excepted 'nameserver' to be str.")
+            return False
+
+        if not isinstance(self._serial, int):
+            self._add_error(u"Excepted 'serial' to be int.")
+            return False
+
+        if not isinstance(self._email, str):
+            self._add_error(u"Excepted 'email' to be str.")
+            return False
+
+        if self._email.count('.') <= 2:
+            self._add_error(u"Email is missing dot(s) ('.').")
+            return False
+
+        if int(self._ttl.total_seconds()) <= 1:
+            self._add_error(u"Invalid TTL.")
+            return False
+
+        if self._serial <= 0:
+            self._add_error(u"Invalid serial.")
+            return False
+
+        if self._nameserver is None or self._nameserver == "":
+            self._add_error(u"Empty nameserver.")
+            return False
+
+        return True
+
+
 class DNSSoaRecord(DNSRecordBase):
     _type = u'SOA'
 
@@ -223,6 +241,9 @@ class DNSSoaRecord(DNSRecordBase):
             return False
 
         return True
+
+    def __str__(self) -> str:
+        return "{0} {1}".format(self._name, self._data)
 
 
 class DNSMxRecordData(DNSRecordMainBase):

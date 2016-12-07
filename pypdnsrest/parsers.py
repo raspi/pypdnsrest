@@ -29,9 +29,9 @@ class SoaRecordParser(RecordParser):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
 
         tmp = data['content'].split(" ")
-        d = DNSSoaRecordData(nameserver=tmp[0], email=tmp[1], serial=int(tmp[2]), refresh=timedelta(seconds=tmp[3]),
-                             retry=timedelta(seconds=tmp[4]), expire=timedelta(seconds=tmp[4]),
-                             ttl=timedelta(seconds=tmp[5]))
+        d = DNSSoaRecordData(nameserver=tmp[0], email=tmp[1], serial=int(tmp[2]), refresh=timedelta(seconds=int(tmp[3])),
+                             retry=timedelta(seconds=int(tmp[4])), expire=timedelta(seconds=int(tmp[4])),
+                             ttl=timedelta(seconds=int(tmp[5])))
         rec = DNSSoaRecord(name)
         rec.set_data(d)
         return rec
