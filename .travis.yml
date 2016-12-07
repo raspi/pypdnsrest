@@ -3,21 +3,14 @@ sudo: required
 
 language: python
 
+services:
+  - docker
+
 cache:
     pip: true
     directories:
         - $HOME/.cache/pip
         - .tox
-
-before_cache:
-    - rm -f $HOME/.cache/pip/log/debug.log
-
-before_script:
-    - sudo apt-get -qq update
-    - sudo apt-get -qq -y install pdns-backend-sqlite3
-    - sudo /etc/init.d/pdns stop
-    - sudo pdns_server --help
-
 
 matrix:
     include:
@@ -35,6 +28,16 @@ matrix:
         - env: TOXENV=py36
         - env: TOXENV=py37
         - env: TOXENV=py3-cover,coverage
+
+before_cache:
+    - rm -f $HOME/.cache/pip/log/debug.log
+
+before_script:
+    - sudo apt-get -qq update
+
+before_install:
+  - docker pull raspi/docker-powerdns-travis-ci-rest-test
+  - docker run raspi/docker-powerdns-travis-ci-rest-test
 
 install:
   - travis_retry pip install tox
