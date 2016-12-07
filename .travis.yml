@@ -15,7 +15,7 @@ before_cache:
 before_script:
     - sudo apt-get -qq update
     - sudo apt-get -qq -y install pdns-backend-sqlite3
-    - sudo systemctl stop pdns
+    - sudo /etc/init.d/pdns stop
     - export PDNSCONF=/etc/powerdns/pdns.conf
     - sudo echo "config-dir=/etc/powerdns" > $PDNSCONF
     - sudo echo "master=yes" >> $PDNSCONF
@@ -35,7 +35,7 @@ before_script:
     - sudo echo "webserver-password=pdnsapi" >> $PDNSCONF
     - sudo echo "webserver-port=8081" >> $PDNSCONF
     - sudo cat $PDNSCONF
-    - sudo systemctl start pdns
+    - sudo /etc/init.d/pdns start
 
 
 matrix:
