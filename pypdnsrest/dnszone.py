@@ -20,6 +20,8 @@ class DNSZoneInvalidException(DNSZoneException):
 class DNSZoneBase:
     _records = []
 
+    def get_records(self) -> list:
+        return self._records
 
 class DNSZone(DNSZoneBase):
 
@@ -34,9 +36,6 @@ class DNSZone(DNSZoneBase):
             raise InvalidDNSRecordException(u"Invalid record.")
 
         return True
-
-    def get_records(self) -> list:
-        return self._records
 
     def validate(self) -> bool:
         recs = self.get_records()
