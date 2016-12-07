@@ -63,7 +63,7 @@ class DNSRecordBase(DNSRecordMainBase):
 class DNSARecord(DNSRecordBase):
     _type = u'A'
 
-    def set_data(self, data: IPv4Address) -> bool:
+    def set_data(self, data: IPv4Address, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
@@ -80,7 +80,7 @@ class DNSARecord(DNSRecordBase):
 class DNSAaaaRecord(DNSRecordBase):
     _type = u'AAAA'
 
-    def set_data(self, data: IPv6Address) -> bool:
+    def set_data(self, data: IPv6Address, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
@@ -97,7 +97,7 @@ class DNSAaaaRecord(DNSRecordBase):
 class DNSNsRecord(DNSRecordBase):
     _type = u'NS'
 
-    def set_data(self, data: str) -> bool:
+    def set_data(self, data: str, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
@@ -122,7 +122,7 @@ class DNSNsRecord(DNSRecordBase):
 class DNSCNameRecord(DNSRecordBase):
     _type = u'CNAME'
 
-    def set_data(self, data: str) -> bool:
+    def set_data(self, data: str, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
@@ -223,7 +223,7 @@ class DNSSoaRecordData(DNSRecordMainBase):
 class DNSSoaRecord(DNSRecordBase):
     _type = u'SOA'
 
-    def set_data(self, data: DNSSoaRecordData) -> bool:
+    def set_data(self, data: DNSSoaRecordData, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
@@ -281,7 +281,7 @@ class DNSMxRecordData(DNSRecordMainBase):
 class DNSMxRecord(DNSRecordBase):
     _type = u'MX'
 
-    def set_data(self, data: DNSMxRecordData):
+    def set_data(self, data: DNSMxRecordData, ttl: timedelta = timedelta(seconds=0)):
         self._data = data
 
         if not self.validate():
@@ -304,7 +304,7 @@ class DNSMxRecord(DNSRecordBase):
 class DNSPtrRecord(DNSRecordBase):
     _type = u'PTR'
 
-    def set_data(self, data) -> bool:
+    def set_data(self, data, ttl: timedelta = timedelta(seconds=0)) -> bool:
         self._data = data
 
         if not self.validate():
