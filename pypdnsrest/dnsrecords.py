@@ -20,11 +20,11 @@ class DNSRecordMainBase:
     def _get_errors(self) -> list:
         return self._errors
 
-    def set_data(self, data, *args, **kwargs) -> bool:
-        raise NotImplementedError("Not implemented")
+    def set_data(self, *args, **kwargs) -> bool:
+        raise NotImplementedError(u"Not implemented")
 
     def validate(self) -> bool:
-        raise NotImplementedError("Not implemented")
+        raise NotImplementedError(u"Not implemented")
 
     def get_record(self) -> dict:
         return {
@@ -44,17 +44,17 @@ class DNSRecordBase(DNSRecordMainBase):
         self._name = name
 
         if ttl.total_seconds() > 0:
-            self.ttl = ttl
+            self._ttl = ttl
 
     def __str__(self):
         return u"{0} {1} {2} {3}".format(str(self._name), int(self._ttl.total_seconds()), self._type,
                                          str(self._data))
 
     def set_data(self, *args, **kwargs) -> bool:
-        raise NotImplementedError("Not implemented")
+        raise NotImplementedError(u"Not implemented")
 
     def validate(self) -> bool:
-        raise NotImplementedError("Not implemented")
+        raise NotImplementedError(u"Not implemented")
 
     def get_data(self):
         return self._data
@@ -63,57 +63,62 @@ class DNSRecordBase(DNSRecordMainBase):
 class DNSARecord(DNSRecordBase):
     _type = u'A'
 
-    def set_data(self, data: IPv4Address, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data: IPv4Address) -> bool:
         self._data = data
 
         if not self.validate():
-            raise InvalidDNSRecordException("Invalid type. IPv4Address excepted.")
+            self._add_error(u"Invalid type.")
+            raise InvalidDNSRecordException("\n".join(self._get_errors()))
 
         return True
 
     def validate(self) -> bool:
-        if isinstance(self._data, IPv4Address):
-            return True
-        return False
+        if not isinstance(self._data, IPv4Address):
+            self._add_error(u"IPv4Address excepted.")
+            return False
+        return True
 
 
 class DNSAaaaRecord(DNSRecordBase):
     _type = u'AAAA'
 
-    def set_data(self, data: IPv6Address, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data: IPv6Address) -> bool:
         self._data = data
 
         if not self.validate():
-            raise InvalidDNSRecordException("Invalid type. IPv6Address excepted.")
+            self._add_error(u"Invalid type.")
+            raise InvalidDNSRecordException("\n".join(self._get_errors()))
 
         return True
 
     def validate(self) -> bool:
-        if isinstance(self._data, IPv6Address):
-            return True
-        return False
+        if not isinstance(self._data, IPv6Address):
+            self._add_error(u"IPv6Address excepted.")
+            return False
+        return True
 
 
 class DNSNsRecord(DNSRecordBase):
     _type = u'NS'
 
-    def set_data(self, data: str, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data: str) -> bool:
         self._data = data
 
         if not self.validate():
-            self._add_error("Invalid type.")
+            self._add_error(u"Invalid type.")
             raise InvalidDNSRecordException("\n".join(self._get_errors()))
 
         return True
 
     def validate(self) -> bool:
         if not isinstance(self._data, str):
+            self._add_error(u"Data is not str.")
             return False
-        elif self._data is None:
-            self._add_error("'None' given.")
+        if self._data is None:
+            self._add_error(u"'None' given.")
             return False
-        elif self._data == "":
-            self._add_error("Empty string given.")
+        if self._data == "":
+            self._add_error(u"Empty string given.")
             return False
 
         return True
@@ -122,7 +127,7 @@ class DNSNsRecord(DNSRecordBase):
 class DNSCNameRecord(DNSRecordBase):
     _type = u'CNAME'
 
-    def set_data(self, data: str, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data: str) -> bool:
         self._data = data
 
         if not self.validate():
@@ -133,10 +138,12 @@ class DNSCNameRecord(DNSRecordBase):
 
     def validate(self) -> bool:
         if not isinstance(self._data, str):
+            self._add_error(u"Data is not str.")
             return False
-        elif self._data is None:
+        if self._data is None:
+            self._add_error(u"'None' given.")
             return False
-        elif self._data == "":
+        if self._data == "":
             self._add_error("Empty string given.")
             return False
 
@@ -223,7 +230,7 @@ class DNSSoaRecordData(DNSRecordMainBase):
 class DNSSoaRecord(DNSRecordBase):
     _type = u'SOA'
 
-    def set_data(self, data: DNSSoaRecordData, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data: DNSSoaRecordData) -> bool:
         self._data = data
 
         if not self.validate():
@@ -238,7 +245,7 @@ class DNSSoaRecord(DNSRecordBase):
             return False
 
         if not self._data.validate():
-            self._add_error("Invalid SOA data.")
+            self._add_error("Invalid SOA data. Data: {0}.".format(self._data))
             return False
 
         return True
@@ -257,6 +264,9 @@ class DNSMxRecordData(DNSRecordMainBase):
 
         if ttl.total_seconds() > 0:
             self.ttl = ttl
+
+    def __str__(self) -> str:
+        return u"{0} {1} {2}".format(self._priority, self._server, int(self._ttl.total_seconds()))
 
     def validate(self) -> bool:
         if not isinstance(self._server, str):
@@ -281,7 +291,7 @@ class DNSMxRecordData(DNSRecordMainBase):
 class DNSMxRecord(DNSRecordBase):
     _type = u'MX'
 
-    def set_data(self, data: DNSMxRecordData, ttl: timedelta = timedelta(seconds=0)):
+    def set_data(self, data: DNSMxRecordData):
         self._data = data
 
         if not self.validate():
@@ -295,7 +305,7 @@ class DNSMxRecord(DNSRecordBase):
             return False
 
         if not self._data.validate():
-            self._add_error("Data is invalid.")
+            self._add_error("Data is invalid. Data: {0}".format(self._data))
             return False
 
         return True
@@ -304,7 +314,7 @@ class DNSMxRecord(DNSRecordBase):
 class DNSPtrRecord(DNSRecordBase):
     _type = u'PTR'
 
-    def set_data(self, data, ttl: timedelta = timedelta(seconds=0)) -> bool:
+    def set_data(self, data) -> bool:
         self._data = data
 
         if not self.validate():
