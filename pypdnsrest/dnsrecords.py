@@ -1,5 +1,7 @@
 # -*- coding: utf8 -*-
 
+import abc
+
 from datetime import timedelta
 from ipaddress import IPv4Address
 from ipaddress import IPv6Address
@@ -20,6 +22,7 @@ class DNSRecordMainBase:
     def _get_errors(self) -> list:
         return self._errors
 
+    @abc.abstractmethod
     def set_data(self, *args, **kwargs) -> bool:
         raise NotImplementedError(u"Not implemented")
 
