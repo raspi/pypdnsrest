@@ -92,7 +92,7 @@ class TestZone(unittest.TestCase):
 
         from pypdnsrest.dnsrecords import DNSNsRecord
         rec = DNSNsRecord(self.zone)
-        rec.set_data("ns1.".format(self.zone))
+        rec.set_data("ns1.{0}".format(self.zone))
         z.add_record(rec)
 
         from pypdnsrest.dnsrecords import DNSARecord
