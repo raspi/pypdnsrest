@@ -9,45 +9,79 @@ if __name__ == "__main__":
 
     logging.basicConfig(
         stream=sys.stdout,
-        level=logging.DEBUG
+        #level=logging.DEBUG
     )
 
-    #from pypdnsrest.client import PowerDnsRestApiClient
+    from pypdnsrest.client import PowerDnsRestApiClient
 
-    #api = PowerDnsRestApiClient("pdnsapi")
-    #api.del_zone("home.lan.")
+    zone = u"example.org."
 
-    # api.add_zone("home.lan.", ["ns1.home.lan.", ])
+    api = PowerDnsRestApiClient("pdnsapi")
 
-    # Add record
-    #from ipaddress import IPv4Address
-    #from pypdnsrest.dnsrecords import DNSARecord
-    #rec = DNSARecord("gw.home.lan.")
-    #rec.set_data(IPv4Address("192.168.101.1"))
-    #api.add_record("home.lan.", rec)
+    try:
+        api.del_zone(zone)
+    except:
+        pass
 
-    #from ipaddress import IPv4Address
-    #from pypdnsrest.dnsrecords import DNSPtrRecord
-    #rec = DNSPtrRecord("gw.home.lan.")
-    #rec.set_data(IPv4Address("192.168.101.1"))
-    #api.add_record("home.lan.", rec)
+    api.add_zone(zone, ["ns1.{0}".format(zone), "ns2.{0}".format(zone), ])
 
-    #from pypdnsrest.dnsrecords import DNSNsRecord
-    #rec = DNSNsRecord("home.lan.")
-    #rec.set_data("ns1.home.lan.")
-    #api.add_record("home.lan.", rec)
+    # Add SOA record
+    from pypdnsrest.dnsrecords import DNSSoaRecord
+    from pypdnsrest.dnsrecords import DNSSoaRecordData
 
-    #from pypdnsrest.dnsrecords import DNSNsRecord
-    #rec = DNSNsRecord("home.lan.")
-    #rec.set_data("ns2.home.lan.")
-    #api.add_record("home.lan.", rec)
+    serial = -1
+    for i in api.get_zone(zone).get_records():
+        if isinstance(i, DNSSoaRecord):
+            recdata = i.get_data()
+            if isinstance(recdata, DNSSoaRecordData):
+                serial = recdata.get_data()['serial']
 
 
-    #zone = api.get_zone("home.lan")
-    #recs = zone.get_records()
-    #for i in recs:
-    #    print(i)
+    soadata = DNSSoaRecordData("ns1.{0}".format(zone), "admin.{0}".format(zone), serial+1)
+    rec = DNSSoaRecord(zone)
+    rec.set_data(soadata)
 
-    # zone = api.get_zone("invalid.test")
-    # recs = zone.get_records()
-    # print(recs)
+    print(rec)
+
+    api.add_record(zone, rec)
+
+    # Add NS records
+    from pypdnsrest.dnsrecords import DNSNsRecord
+
+    rec = DNSNsRecord(zone)
+    rec.set_data("ns1.{0}".format(zone))
+    api.add_record(zone, rec)
+
+    rec = DNSNsRecord(zone)
+    rec.set_data("ns2.{0}".format(zone))
+    api.add_record(zone, rec)
+
+    # Add A records
+    from ipaddress import IPv4Address
+    from pypdnsrest.dnsrecords import DNSARecord
+
+    rec = DNSARecord(zone)
+    rec.set_data(IPv4Address("192.168.0.1"))
+    api.add_record(zone, rec)
+
+    rec = DNSARecord("ns1.{0}".format(zone))
+    rec.set_data(IPv4Address("192.168.0.1"))
+    api.add_record(zone, rec)
+
+    rec = DNSARecord("ns2.{0}".format(zone))
+    rec.set_data(IPv4Address("192.168.0.1"))
+    api.add_record(zone, rec)
+
+    # Add PTR record
+    from pypdnsrest.dnsrecords import DNSPtrRecord
+
+    rec = DNSPtrRecord(zone)
+    rec.set_data(IPv4Address("192.168.101.1"))
+    api.add_record(zone, rec)
+
+    zonedata = api.get_zone(zone)
+    recs = zonedata.get_records()
+    for i in recs:
+        print(i)
+
+    api.del_zone(zone)
