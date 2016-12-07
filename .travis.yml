@@ -37,7 +37,8 @@ before_script:
 
 before_install:
   - docker pull raspi/docker-powerdns-travis-ci-rest-test
-  - docker run --detach raspi/docker-powerdns-travis-ci-rest-test
+  - docker run --network host --detach raspi/docker-powerdns-travis-ci-rest-test
+  - sudo netstat --listening --protocol inet --numeric
 
 install:
   - travis_retry pip install tox
