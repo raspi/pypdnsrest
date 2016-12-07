@@ -246,9 +246,9 @@ class PowerDnsRestApiClient:
         r = self._req_delete("zones/{0}".format(zone))
         return True
 
-    def _generate_record(self, record: dict, changetype: str = "REPLACE") -> dict:
-        if changetype.lower() not in ['replace', 'delete']:
-            raise ValueError("Invalid value for changetype: '{0}'.".format(changetype))
+    def _generate_record(self, record: dict, changetype: str = u"REPLACE") -> dict:
+        if changetype.lower() not in [u'replace', u'delete']:
+            raise ValueError(u"Invalid value for changetype: '{0}'.".format(changetype))
 
         rec = {"rrsets": [{
             "name": record['name'],
