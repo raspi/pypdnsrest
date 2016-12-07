@@ -13,7 +13,6 @@ from requests.models import PreparedRequest
 from pypdnsrest.dnsrecords import DNSRecordMainBase
 from pypdnsrest.dnsrecords import InvalidDNSRecordException
 
-from pypdnsrest.dnszone import DNSZoneInvalidException
 from pypdnsrest.dnszone import DNSZone
 
 from pypdnsrest.parsers import RecordParser
@@ -238,17 +237,14 @@ class PowerDnsRestApiClient:
             parsername = u"{0}RecordParser".format(i['type'].title())
 
             for recs in i['records']:
-                try:
-                    for parser in self.get_parsers():
-                        if type(parser).__name__.lower() == parsername.lower():
-                            o.add_record(parser.parse(i['name'], recs, int(i['ttl'])))
-                except Exception as exc:
-                    log.warning(u"Parser error: {0}. Parser: {1}.".format(exc, type(parser).__name__))
+                for parser in self.get_parsers():
+                    if type(parser).__name__.lower() == parsername.lower():
+                        try:
+                            o.add_record(parser.parse(i['name'], recs['content'], int(i['ttl'])))
+                        except Exception as exc:
+                            log.warning(u"Parser error: {0}. Parser: {1}.".format(exc, type(parser).__name__))
 
-        if o.validate():
-            return o
-
-        raise DNSZoneInvalidException(u"Invalid zone.")
+        return o
 
     def del_zone(self, zone: str) -> bool:
         r = self._req_delete(u"zones/{0}".format(zone))

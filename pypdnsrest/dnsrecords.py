@@ -49,7 +49,7 @@ class DNSRecordBase(DNSRecordMainBase):
         if ttl.total_seconds() > 0:
             self._ttl = ttl
 
-    def __str__(self):
+    def __str__(self) -> str:
         return u"{0} {1} {2} {3}".format(str(self._name), int(self._ttl.total_seconds()), self._type,
                                          str(self._data))
 
@@ -124,6 +124,21 @@ class DNSNsRecord(DNSRecordBase):
             self._add_error(u"Empty string given.")
             return False
 
+        if self._data.count(":") != 0:
+            self._add_error(u"Record can't be IPv6 address.")
+            return False
+
+        if self._data.count(".") == 3:
+            from ipaddress import AddressValueError
+            from ipaddress import IPv4Address
+
+            try:
+                IPv4Address(self._data)
+                self._add_error(u"Record can't be IPv4 address.")
+                return False
+            except AddressValueError:
+                pass
+
         return True
 
 
@@ -187,7 +202,7 @@ class DNSSoaRecordData(DNSRecordMainBase):
                                                      int(self._retry.total_seconds()),
                                                      int(self._expire.total_seconds()), int(self._ttl.total_seconds()))
 
-    def get_data(self):
+    def get_data(self) -> dict:
         return {
             'nameserver': self._nameserver,
             'email': self._email,
@@ -219,7 +234,7 @@ class DNSSoaRecordData(DNSRecordMainBase):
             self._add_error(u"Invalid TTL.")
             return False
 
-        if self._serial <= 0:
+        if self._serial < 0:
             self._add_error(u"Invalid serial.")
             return False
 
@@ -337,10 +352,10 @@ class DNSPtrRecord(DNSRecordBase):
 
         return is_valid
 
-    def __str__(self):
+    def __str__(self) -> str:
         return u"{0} {1} {2} {3}".format(self._data.reverse_pointer, int(self._ttl.total_seconds()), self._type,
                                          self._name)
 
-    def get_record(self):
+    def get_record(self) -> dict:
         return {'ttl': int(self._ttl.total_seconds()), 'type': self._type, 'name': self._name,
                 'data': "{0}.".format(self._data.reverse_pointer)}

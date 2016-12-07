@@ -36,7 +36,7 @@ class DNSZone(DNSZoneBase):
         if record.validate():
             self._records.append(record)
         else:
-            raise InvalidDNSRecordException(u"Invalid record.")
+            raise InvalidDNSRecordException(u"Invalid record. Record: {0}".format(type(record)))
 
         return True
 

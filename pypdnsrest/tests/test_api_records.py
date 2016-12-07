@@ -34,5 +34,5 @@ class TestApiRecords(unittest.TestCase):
         from ipaddress import IPv6Address
         from pypdnsrest.dnsrecords import DNSAaaaRecord
         rec = DNSAaaaRecord(self.zone)
-        rec.set_data(IPv6Address(u"fd00::"))
+        rec.set_data(IPv6Address(u"fd12:3456:789a:bcde:f012:3456:789a:bcde"))
         self.assertTrue(self.api.add_record(self.zone, rec))

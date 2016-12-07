@@ -28,7 +28,7 @@ class TestZone(unittest.TestCase):
         z = DNSZone()
 
         rec = DNSAaaaRecord(self.zone)
-        rec.set_data(IPv6Address(u"fd00::"))
+        rec.set_data(IPv6Address(u"fd12:3456:789a:bcde:f012:3456:789a:bcde"))
         self.assertTrue(z.add_record(rec))
 
     def test_add_cname_record(self):

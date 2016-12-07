@@ -7,6 +7,38 @@ import unittest
 from pypdnsrest.dnsrecords import InvalidDNSRecordException
 
 
+class TestRecordMainBaseClass(unittest.TestCase):
+    def test_set_data(self):
+        from pypdnsrest.dnsrecords import DNSRecordMainBase
+        c = DNSRecordMainBase()
+        with self.assertRaises(NotImplementedError) as context:
+            c.set_data()
+
+    def test_validate(self):
+        from pypdnsrest.dnsrecords import DNSRecordMainBase
+        c = DNSRecordMainBase()
+        with self.assertRaises(NotImplementedError) as context:
+            c.validate()
+
+
+class TestRecordBaseClass(unittest.TestCase):
+    def test_set_data(self):
+        from pypdnsrest.dnsrecords import DNSRecordBase
+        c = DNSRecordBase(u"")
+        with self.assertRaises(NotImplementedError) as context:
+            c.set_data()
+
+    def test_validate(self):
+        from pypdnsrest.dnsrecords import DNSRecordBase
+        c = DNSRecordBase(u"")
+        with self.assertRaises(NotImplementedError) as context:
+            c.validate()
+
+    def test_str(self):
+        from pypdnsrest.dnsrecords import DNSRecordBase
+        self.assertIsInstance(str(DNSRecordBase(u"")), str)
+
+
 class TestRecords(unittest.TestCase):
     def setUp(self):
         self.zone = u"{0}.zone.".format(type(self).__name__.lower())
@@ -37,7 +69,7 @@ class TestAaaaRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSAaaaRecord
         from ipaddress import IPv6Address
         rec = DNSAaaaRecord(self.zone)
-        self.assertTrue(rec.set_data(IPv6Address(u"fd00::")))
+        self.assertTrue(rec.set_data(IPv6Address(u"fd12:3456:789a:bcde:f012:3456:789a:bcde")))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSAaaaRecord
@@ -193,7 +225,7 @@ class TestPtrRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSPtrRecord
         from ipaddress import IPv6Address
         rec = DNSPtrRecord(self.zone)
-        self.assertTrue(rec.set_data(IPv6Address(u"fd00::")))
+        self.assertTrue(rec.set_data(IPv6Address(u"fd12:3456:789a:bcde:f012:3456:789a:bcde")))
 
     def test_record_empty(self):
         from pypdnsrest.dnsrecords import DNSPtrRecord
