@@ -62,7 +62,7 @@ class PowerDnsRestApiClient:
 
         try:
             body = json.dumps(json.loads(body), indent=4)
-        except:
+        except Exception:
             pass
 
         o += u"{0}\n".format(body)
