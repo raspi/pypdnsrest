@@ -187,7 +187,7 @@ class PowerDnsRestApiClient:
             "nameservers": nameservers,
         }
 
-        req = self._req_post(u"zones", data=json.dumps(zone))
+        self._req_post(u"zones", data=json.dumps(zone))
 
         return True
 
@@ -247,7 +247,7 @@ class PowerDnsRestApiClient:
         return o
 
     def del_zone(self, zone: str) -> bool:
-        r = self._req_delete(u"zones/{0}".format(zone))
+        self._req_delete(u"zones/{0}".format(zone))
         return True
 
     def _generate_record(self, record: dict, changetype: str = u"REPLACE") -> dict:
@@ -279,9 +279,7 @@ class PowerDnsRestApiClient:
             raise InvalidDNSRecordException(u"Invalid record.")
 
         rec = self._generate_record(record.get_record(), u'delete')
-
-        req = self._req_patch(u"zones/{0}".format(zone), data=json.dumps(rec))
-
+        self._req_patch(u"zones/{0}".format(zone), data=json.dumps(rec))
         return True
 
     def _merge_record(self, zone: str, rec: dict) -> dict:
@@ -310,5 +308,5 @@ class PowerDnsRestApiClient:
         rec = self._generate_record(rrdata, u'replace')
         rec = self._merge_record(zone, rec)
         data = json.dumps(rec)
-        req = self._req_patch(u"zones/{0}".format(zone), data=data)
+        self._req_patch(u"zones/{0}".format(zone), data=data)
         return True
