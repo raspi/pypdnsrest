@@ -114,12 +114,14 @@ class DNSNsRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
-        if not isinstance(self._data, str):
-            self._add_error(u"Data is not str.")
-            return False
         if self._data is None:
             self._add_error(u"'None' given.")
             return False
+
+        if not isinstance(self._data, str):
+            self._add_error(u"Data is not str.")
+            return False
+
         if self._data == "":
             self._add_error(u"Empty string given.")
             return False
@@ -130,7 +132,6 @@ class DNSNsRecord(DNSRecordBase):
 
         if self._data.count(".") == 3:
             from ipaddress import AddressValueError
-            from ipaddress import IPv4Address
 
             try:
                 IPv4Address(self._data)
@@ -155,12 +156,14 @@ class DNSCNameRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
-        if not isinstance(self._data, str):
-            self._add_error(u"Data is not str.")
-            return False
         if self._data is None:
             self._add_error(u"'None' given.")
             return False
+
+        if not isinstance(self._data, str):
+            self._add_error(u"Data is not str.")
+            return False
+
         if self._data == "":
             self._add_error("Empty string given.")
             return False
