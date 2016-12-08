@@ -28,6 +28,11 @@ class TestRecordBaseClass(unittest.TestCase):
         with self.assertRaises(NotImplementedError) as context:
             c.set_data()
 
+    def test_get_data(self):
+        from pypdnsrest.dnsrecords import DNSRecordBase
+        c = DNSRecordBase(u"")
+        self.assertIsNone(c.get_data())
+
     def test_validate(self):
         from pypdnsrest.dnsrecords import DNSRecordBase
         c = DNSRecordBase(u"")
