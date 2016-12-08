@@ -89,10 +89,10 @@ class TestPtrParser(TestParserBase):
         from pypdnsrest.parsers import PtrRecordParser
         p = PtrRecordParser()
         with self.assertRaises(ValueError) as context:
-            rec = p.parse(self.zone, u"", 3600)
+            p.parse(self.zone, u"", 3600)
 
     def test_parser_empty2(self):
         from pypdnsrest.parsers import PtrRecordParser
         p = PtrRecordParser()
         with self.assertRaises(AttributeError) as context:
-            rec = p.parse(self.zone, None, 3600)
+            p.parse(self.zone, None, 3600)
