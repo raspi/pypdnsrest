@@ -1,7 +1,7 @@
 import unittest
 
 from pypdnsrest.client import PowerDnsRestApiClient
-from  pypdnsrest.dnsrecords import InvalidDNSRecordException
+from pypdnsrest.dnsrecords import InvalidDNSRecordException
 
 
 class TestApiRecords(unittest.TestCase):
