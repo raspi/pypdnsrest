@@ -41,11 +41,11 @@ before_install:
   - sudo netstat --listening --protocol inet --numeric
 
 install:
-  - travis_retry pip install tox
+  - travis_retry pip install tox codeclimate-test-reporter codecov
 
 script:
   - travis_retry tox
 
 after_sucess:
-  - pip install codeclimate-test-reporter
   - codeclimate-test-reporter
+  - codecov
