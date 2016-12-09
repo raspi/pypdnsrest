@@ -76,6 +76,9 @@ class DNSARecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
         if not isinstance(self._data, IPv4Address):
             self._add_error(u"IPv4Address excepted.")
             return False
@@ -95,6 +98,9 @@ class DNSAaaaRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
         if not isinstance(self._data, IPv6Address):
             self._add_error(u"IPv6Address excepted.")
             return False
@@ -241,7 +247,7 @@ class DNSSoaRecordData(DNSRecordMainBase):
             self._add_error(u"Invalid serial.")
             return False
 
-        if self._nameserver is None or self._nameserver == "":
+        if self._nameserver == "":
             self._add_error(u"Empty nameserver.")
             return False
 
@@ -261,6 +267,10 @@ class DNSSoaRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
+
         if not isinstance(self._data, DNSSoaRecordData):
             self._add_error("Invalid instance.")
             return False
@@ -322,6 +332,10 @@ class DNSMxRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
+
         if not isinstance(self._data, DNSMxRecordData):
             return False
 
@@ -345,6 +359,10 @@ class DNSPtrRecord(DNSRecordBase):
         return True
 
     def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
+
         is_valid = False
         if isinstance(self._data, IPv4Address):
             is_valid = True

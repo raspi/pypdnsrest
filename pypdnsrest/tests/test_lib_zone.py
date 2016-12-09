@@ -4,6 +4,7 @@ Test internal classes
 
 import unittest
 
+from pypdnsrest.dnsrecords import InvalidDNSRecordException
 from pypdnsrest.dnszone import DNSZone
 
 
@@ -118,3 +119,44 @@ class TestZone(unittest.TestCase):
         z.add_record(rec)
 
         self.assertTrue(z.validate())
+
+    def test_invalid_type(self):
+        z = DNSZone()
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            z.add_record(int(1))
+
+    def test_invalid_data(self):
+        from pypdnsrest.dnsrecords import DNSNsRecord
+
+        z = DNSZone()
+        rec = DNSNsRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            z.add_record(rec)
+
+    def test_to_string(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+
+        rec = DNSSoaRecord(self.zone)
+        rec.set_data(soadata)
+
+        z = DNSZone()
+        z.add_record(rec)
+
+        self.assertIsInstance(str(z), str)
+
+    def test_invalid_zone(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+
+        rec = DNSSoaRecord(self.zone)
+        rec.set_data(soadata)
+
+        z = DNSZone()
+        z.add_record(rec)
+
+        self.assertFalse(z.validate())

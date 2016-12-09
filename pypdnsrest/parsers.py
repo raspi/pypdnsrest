@@ -47,7 +47,7 @@ class MxRecordParser(RecordParser):
         from pypdnsrest.dnsrecords import DNSMxRecordData
 
         tmp = data.split(" ")
-        d = DNSMxRecordData(priority=tmp[0], server=tmp[1])
+        d = DNSMxRecordData(priority=int(tmp[0]), server=tmp[1])
         rec = DNSMxRecord(name, timedelta(seconds=ttl))
         rec.set_data(d)
         return rec
@@ -88,20 +88,37 @@ class NsRecordParser(RecordParser):
 
 
 class PtrRecordParser(RecordParser):
+    def _prepare_data(self, data: str):
+        data = data.lower()
+        data = data.replace(u"in-addr.arpa", '')
+        data = data.replace(u"ip6.arpa", '')
+        data = data.strip(".")
+
+        import re
+        data = re.sub("""[^\da-f\.]*""", '', data, flags=re.IGNORECASE)
+
+        if data.count(".") < 3:
+            raise ValueError("Invalid data: {0}".format(data))
+
+        # Reverse 1.0.168.192 -> 192.168.0.1
+        return ".".join(data.split(".")[::-1])
+
     def parse(self, name: str, data: str, ttl: int) -> DNSRecordBase:
-        if data.lower().find("in-addr.arpa.") == -1:
+        if data.lower().find(u"in-addr.arpa".lower()) > 0:
+            data = self._prepare_data(data)
+            from ipaddress import IPv4Address
+            data = IPv4Address(data)
+        elif data.lower().find(u"ip6.arpa".lower()) > 0:
+            data = self._prepare_data(data)
+            data = "".join(data.split("."))
+            data = ":".join([data[i:i + 4] for i in range(0, len(data), 4)])
+            from ipaddress import IPv6Address
+            data = IPv6Address(data)
+        else:
             raise ValueError(u"Invalid PTR value: '{0}'".format(data))
 
         from pypdnsrest.dnsrecords import DNSPtrRecord
-        cont = ".".join(data.lower().replace("in-addr.arpa", '').strip(".").split('.')[::-1])
-
-        if cont.count(".") == 3:
-            from ipaddress import IPv4Address
-            cont = IPv4Address(cont)
-        else:
-            from ipaddress import IPv6Address
-            cont = IPv6Address(cont)
 
         rec = DNSPtrRecord(name, timedelta(seconds=ttl))
-        rec.set_data(cont)
+        rec.set_data(data)
         return rec

@@ -8,6 +8,8 @@ from setuptools import setup
 here = os.path.abspath(os.path.dirname(__file__))
 
 classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
     "Programming Language :: Python",
     "Topic :: Internet :: WWW/HTTP",
 ]
@@ -25,7 +27,7 @@ tests_require = [
 testing_extras = tests_require + [
     'nose',
     'coverage',
-    'virtualenv',  # for scaffolding tests
+    'virtualenv',
 ]
 
 setup(author=u'Pekka Järvinen',

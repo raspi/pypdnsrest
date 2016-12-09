@@ -68,6 +68,12 @@ class TestARecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(None)
 
+    def test_record_invalid(self):
+        from pypdnsrest.dnsrecords import DNSARecord
+        rec = DNSARecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(int(1))
+
 
 class TestAaaaRecord(TestRecords):
     def test_record(self):
@@ -107,6 +113,12 @@ class TestCnameRecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(None)
 
+    def test_invalid(self):
+        from pypdnsrest.dnsrecords import DNSCNameRecord
+        rec = DNSCNameRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(int(1))
+
 
 class TestNsRecord(TestRecords):
     def test_record(self):
@@ -126,6 +138,24 @@ class TestNsRecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(None)
 
+    def test_invalid_ipv4(self):
+        from pypdnsrest.dnsrecords import DNSNsRecord
+        rec = DNSNsRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(u"192.168.0.1")
+
+    def test_invalid_ipv6(self):
+        from pypdnsrest.dnsrecords import DNSNsRecord
+        rec = DNSNsRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(u"fd12:3456:789a:bcde:f012:3456:789a:bcde")
+
+    def test_invalid_type(self):
+        from pypdnsrest.dnsrecords import DNSNsRecord
+        rec = DNSNsRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(int(1))
+
 
 class TestMxRecord(TestRecords):
     def test_record(self):
@@ -133,6 +163,16 @@ class TestMxRecord(TestRecords):
         from pypdnsrest.dnsrecords import DNSMxRecordData
 
         mxdata = DNSMxRecordData(u"mail.{0}".format(self.zone), 10)
+
+        rec = DNSMxRecord(self.zone)
+        self.assertTrue(rec.set_data(mxdata))
+
+    def test_record2(self):
+        from datetime import timedelta
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        from pypdnsrest.dnsrecords import DNSMxRecordData
+
+        mxdata = DNSMxRecordData(u"mail.{0}".format(self.zone), 10, timedelta(hours=1))
 
         rec = DNSMxRecord(self.zone)
         self.assertTrue(rec.set_data(mxdata))
@@ -147,6 +187,61 @@ class TestMxRecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(mxdata)
 
+    def test_invalid_server_type(self):
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        from pypdnsrest.dnsrecords import DNSMxRecordData
+
+        mxdata = DNSMxRecordData(int(1), 10)
+
+        rec = DNSMxRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(mxdata)
+
+    def test_invalid_server(self):
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        from pypdnsrest.dnsrecords import DNSMxRecordData
+
+        mxdata = DNSMxRecordData(u"invalid", 10)
+
+        rec = DNSMxRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(mxdata)
+
+    def test_invalid_priority_type(self):
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        from pypdnsrest.dnsrecords import DNSMxRecordData
+
+        mxdata = DNSMxRecordData(u"mail.{0}".format(self.zone), u"invalid")
+
+        rec = DNSMxRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(mxdata)
+
+    def test_data_none(self):
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        rec = DNSMxRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(None)
+
+    def test_data_invalid(self):
+        from pypdnsrest.dnsrecords import DNSMxRecord
+        rec = DNSMxRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(u"invalid")
+
+
+class TestSoaRecordData(TestRecords):
+    def test_get_data(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+        self.assertIsInstance(soadata.get_data(), dict)
+
+    def test_data_to_str(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+        self.assertIsInstance(str(soadata), str)
+
 
 class TestSoaRecord(TestRecords):
     def test_record(self):
@@ -157,6 +252,28 @@ class TestSoaRecord(TestRecords):
 
         rec = DNSSoaRecord(self.zone)
         self.assertTrue(rec.set_data(soadata))
+
+    def test_record2(self):
+        from datetime import timedelta
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1, timedelta(hours=1),
+                                   timedelta(hours=1), timedelta(hours=1), timedelta(hours=1))
+
+        rec = DNSSoaRecord(self.zone)
+        self.assertTrue(rec.set_data(soadata))
+
+    def test_record_str(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1)
+
+        rec = DNSSoaRecord(self.zone)
+        rec.set_data(soadata)
+
+        self.assertIsInstance(str(rec), str)
 
     def test_record_empty_nameserver(self):
         from pypdnsrest.dnsrecords import DNSSoaRecordData
@@ -218,6 +335,42 @@ class TestSoaRecord(TestRecords):
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(soadata)
 
+    def test_record_wrong_serial2(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), "invalid")
+
+        rec = DNSSoaRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(soadata)
+
+    def test_invalid_ttl(self):
+        from datetime import timedelta
+        from pypdnsrest.dnsrecords import DNSSoaRecordData
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        soadata = DNSSoaRecordData(u"ns1.{0}".format(self.zone), u"admin.{0}".format(self.zone), 1, timedelta(hours=1),
+                                   timedelta(hours=1), timedelta(hours=1), timedelta(seconds=1))
+
+        rec = DNSSoaRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(soadata)
+
+    def test_record_data_none(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        rec = DNSSoaRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(None)
+
+    def test_data_type_invalid(self):
+        from pypdnsrest.dnsrecords import DNSSoaRecord
+
+        rec = DNSSoaRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(u"invalid")
+
 
 class TestPtrRecord(TestRecords):
     def test_record_ipv4(self):
@@ -243,3 +396,17 @@ class TestPtrRecord(TestRecords):
         rec = DNSPtrRecord(self.zone)
         with self.assertRaises(InvalidDNSRecordException) as context:
             rec.set_data(None)
+
+    def test_to_str(self):
+        from pypdnsrest.dnsrecords import DNSPtrRecord
+        from ipaddress import IPv4Address
+        rec = DNSPtrRecord(self.zone)
+        rec.set_data(IPv4Address(u"127.0.0.1"))
+        self.assertIsInstance(str(rec), str)
+
+    def test_get_record(self):
+        from pypdnsrest.dnsrecords import DNSPtrRecord
+        from ipaddress import IPv4Address
+        rec = DNSPtrRecord(self.zone)
+        rec.set_data(IPv4Address(u"127.0.0.1"))
+        self.assertIsInstance(rec.get_record(), dict)

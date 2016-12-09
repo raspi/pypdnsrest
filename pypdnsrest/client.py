@@ -22,10 +22,6 @@ class PowerDnsRestApiException(Exception):
     pass
 
 
-class PowerDnsRestApiCall():
-    pass
-
-
 class PowerDnsRestApiClient:
     """
     https://doc.powerdns.com/md/httpapi/api_spec/
@@ -43,6 +39,7 @@ class PowerDnsRestApiClient:
 
     def __init__(self, apikey: str, protocol: str = u"http", host: str = u"127.0.0.1", port: int = 8081,
                  path: str = u"/api/v1/servers/localhost/"):
+        self._rec_parsers = []
         self._host = host
         self._port = port
         self._protocol = protocol
@@ -100,7 +97,7 @@ class PowerDnsRestApiClient:
             except:
                 err = getattr(response, "content", None)
 
-            if err is None:
+            if err is None:  # pragma: no cover
                 err = response.raw
 
             raise PowerDnsRestApiException(err)
@@ -165,19 +162,25 @@ class PowerDnsRestApiClient:
         r = self.c.delete(s['url'], headers=s['headers'])
         return r
 
-    def get_zones(self) -> str:
+    def get_zones(self) -> list:
         return self._req_get("zones").json()
 
     def add_zone(self, name: str, nameservers: list) -> bool:
 
         if not isinstance(nameservers, list):
-            raise ValueError(u"Wrong type. List was excepted.")
+            raise TypeError(u"Wrong type. List was excepted.")
 
         if len(nameservers) == 0:
             raise ValueError(u"No name server(s) listed.")
 
         for i in nameservers:
-            if i is None or i is "":
+            if i is None:
+                raise TypeError(u"Wrong type. str was excepted. None given.")
+
+            if not isinstance(i, str):
+                raise TypeError(u"Wrong type. str was excepted.")
+
+            if i == "":
                 raise ValueError(u"Empty name server given")
 
         zone = {
@@ -192,13 +195,21 @@ class PowerDnsRestApiClient:
         return True
 
     def add_parser(self, parser: RecordParser) -> bool:
-        if not isinstance(parser, RecordParser):
-            raise TypeError(u"Wrong parser type. RecordParser was expected.")
+        parsername = type(parser).__name__
 
-        if parser not in self.get_parsers():
+        if not isinstance(parser, RecordParser):
+            raise TypeError(u"Wrong parser type. RecordParser was expected. '{0}' was given.".format(parsername))
+
+        parsers = self.get_parsers()
+        parsernames = []
+
+        for i in parsers:
+            parsernames.append(parsername)
+
+        if parsername not in parsernames:
             self._rec_parsers.append(parser)
 
-        return True
+        return len(self.get_parsers()) > 0
 
     def get_parsers(self) -> list:
         return self._rec_parsers
@@ -212,10 +223,10 @@ class PowerDnsRestApiClient:
                 continue
             if inspect.isclass(obj) and not inspect.isbuiltin(obj) and object not in obj.__bases__:
                 inst = obj()
-                if isinstance(inst, RecordParser):
+                if isinstance(inst, RecordParser):  # pragma: no cover
                     self.add_parser(inst)
 
-        if len(self.get_parsers()) == 0:
+        if len(self.get_parsers()) == 0:  # pragma: no cover
             raise ImportError(u"Couldn't load default parsers")
 
         return True
@@ -243,6 +254,7 @@ class PowerDnsRestApiClient:
                             o.add_record(parser.parse(i['name'], recs['content'], int(i['ttl'])))
                         except Exception as exc:
                             log.warning(u"Parser error: {0}. Parser: {1}.".format(exc, type(parser).__name__))
+                            raise
 
         return o
 
@@ -251,8 +263,8 @@ class PowerDnsRestApiClient:
         return True
 
     def _generate_record(self, record: dict, changetype: str = u"REPLACE") -> dict:
-        if changetype.lower() not in [u'replace', u'delete']:
-            raise ValueError(u"Invalid value for changetype: '{0}'.".format(changetype))
+        if changetype.lower() not in [u'replace', u'delete']:  # pragma: no cover
+            raise ValueError(u"Invalid value for changetype: '{0}'.".format(changetype))  # pragma: no cover
 
         rec = {"rrsets": [{
             "name": record['name'],
@@ -266,14 +278,14 @@ class PowerDnsRestApiClient:
             ],
         }, ], }
 
-        if changetype.lower() is not u'delete':
-            rec['rrsets'][0]["ttl"] = record['ttl']
+        if changetype.lower() is not u'delete':  # pragma: no cover
+            rec['rrsets'][0]["ttl"] = record['ttl']  # pragma: no cover
 
         return rec
 
     def del_record(self, zone: str, record: DNSRecordMainBase) -> bool:
         if not isinstance(record, DNSRecordMainBase):
-            raise InvalidDNSRecordException()
+            raise TypeError("Invalid type for record: '{0}'.".format(type(record)))
 
         if not record.validate():
             raise InvalidDNSRecordException(u"Invalid record.")
@@ -299,7 +311,7 @@ class PowerDnsRestApiClient:
 
     def add_record(self, zone: str, record: DNSRecordMainBase) -> bool:
         if not isinstance(record, DNSRecordMainBase):
-            raise InvalidDNSRecordException()
+            raise TypeError("Invalid type for record: '{0}'.".format(type(record)))
 
         if not record.validate():
             raise InvalidDNSRecordException(u"Invalid record. Type: {0} Data: {1}".format(type(record), record))
