@@ -16,14 +16,17 @@ if __name__ == "__main__":
 
     zone = u"example.org."
 
-    api = PowerDnsRestApiClient("pdnsapi")
+    api = PowerDnsRestApiClient(u"pdnsapi")
 
     try:
         api.del_zone(zone)
     except:
         pass
 
-    api.add_zone(zone, ["ns1.{0}".format(zone), "ns2.{0}".format(zone), ])
+    api.add_zone(zone, [
+        "ns1.{0}".format(zone),
+        "ns2.{0}".format(zone),
+    ])
 
     # Add SOA record
     from pypdnsrest.dnsrecords import DNSSoaRecord
@@ -39,9 +42,6 @@ if __name__ == "__main__":
     soadata = DNSSoaRecordData("ns1.{0}".format(zone), "admin.{0}".format(zone), serial + 1)
     rec = DNSSoaRecord(zone)
     rec.set_data(soadata)
-
-    print(rec)
-
     api.add_record(zone, rec)
 
     # Add NS records
