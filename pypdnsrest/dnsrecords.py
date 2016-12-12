@@ -380,3 +380,31 @@ class DNSPtrRecord(DNSRecordBase):
     def get_record(self) -> dict:
         return {'ttl': int(self._ttl.total_seconds()), 'type': self._type, 'name': self._name,
                 'data': "{0}.".format(self._data.reverse_pointer)}
+
+
+class DNSTxtRecord(DNSRecordBase):
+    _type = u'TXT'
+
+    def set_data(self, data: str) -> bool:
+        self._data = data
+
+        if not self.validate():
+            self._add_error("Invalid record data.")
+            raise InvalidDNSRecordException("\n".join(self._get_errors()))
+
+        return True
+
+    def validate(self) -> bool:
+        if self._data is None:
+            self._add_error(u"'None' given.")
+            return False
+
+        if not isinstance(self._data, str):
+            self._add_error(u"str expected.")
+            return False
+
+        if self._data == "":
+            self._add_error(u"empty string given.")
+            return False
+
+        return True

@@ -122,3 +122,11 @@ class PtrRecordParser(RecordParser):
         rec = DNSPtrRecord(name, timedelta(seconds=ttl))
         rec.set_data(data)
         return rec
+
+
+class TxtRecordParser(RecordParser):
+    def parse(self, name: str, data: str, ttl: int):
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        rec = DNSTxtRecord(name, timedelta(seconds=ttl))
+        rec.set_data(data)
+        return rec

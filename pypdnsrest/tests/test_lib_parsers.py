@@ -176,3 +176,12 @@ class TestCNameParser(TestParserBase):
         p = CnameRecordParser()
         rec = p.parse(self.zone, u"alias.{0}".format(self.zone), 3600)
         self.assertIsInstance(rec, DNSCNameRecord)
+
+
+class TestTxtParser(TestParserBase):
+    def test_parser(self):
+        from pypdnsrest.parsers import TxtRecordParser
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        p = TxtRecordParser()
+        rec = p.parse(self.zone, u"test", 3600)
+        self.assertIsInstance(rec, DNSTxtRecord)

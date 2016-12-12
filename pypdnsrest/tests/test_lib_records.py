@@ -410,3 +410,28 @@ class TestPtrRecord(TestRecords):
         rec = DNSPtrRecord(self.zone)
         rec.set_data(IPv4Address(u"127.0.0.1"))
         self.assertIsInstance(rec.get_record(), dict)
+
+
+class TestTxtRecord(TestRecords):
+    def test_record(self):
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        rec = DNSTxtRecord(self.zone)
+        self.assertTrue(rec.set_data(u"test text data"))
+
+    def test_none(self):
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        rec = DNSTxtRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(None)
+
+    def test_empty(self):
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        rec = DNSTxtRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(u"")
+
+    def test_invalid(self):
+        from pypdnsrest.dnsrecords import DNSTxtRecord
+        rec = DNSTxtRecord(self.zone)
+        with self.assertRaises(InvalidDNSRecordException) as context:
+            rec.set_data(int(1))
