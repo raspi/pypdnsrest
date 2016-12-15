@@ -34,7 +34,7 @@ if __VERSION__ is not None:
 
 if __VERSION__ is None:
     with open(version_file, "r") as f:
-        f.readlines().strip()
+        __VERSION__ = "".join(f.readlines()).strip()
 
 if __VERSION__ is None or __VERSION__ == "":
     raise ValueError("Version file couldn't be loaded.")
