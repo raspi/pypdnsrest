@@ -1,0 +1,2 @@
+include *.md VERSION
+recursive-include pypdnsrest *.md
