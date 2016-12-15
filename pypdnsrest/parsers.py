@@ -8,7 +8,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from datetime import timedelta
-from pypdnsrest.dnsrecords import DNSRecordBase
+from .dnsrecords import DNSRecordBase
 
 
 class RecordParser():

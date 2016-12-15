@@ -3,10 +3,10 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from pypdnsrest.dnsrecords import DNSNsRecord
-from pypdnsrest.dnsrecords import DNSRecordMainBase
-from pypdnsrest.dnsrecords import DNSSoaRecord
-from pypdnsrest.dnsrecords import InvalidDNSRecordException
+from .dnsrecords import DNSNsRecord
+from .dnsrecords import DNSRecordMainBase
+from .dnsrecords import DNSSoaRecord
+from .dnsrecords import InvalidDNSRecordException
 
 
 class DNSZoneException(Exception):

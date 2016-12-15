@@ -10,12 +10,10 @@ from requests import Session
 from requests.models import Response
 from requests.models import PreparedRequest
 
-from pypdnsrest.dnsrecords import DNSRecordMainBase
-from pypdnsrest.dnsrecords import InvalidDNSRecordException
-
-from pypdnsrest.dnszone import DNSZone
-
-from pypdnsrest.parsers import RecordParser
+from .dnsrecords import DNSRecordMainBase
+from .dnsrecords import InvalidDNSRecordException
+from .dnszone import DNSZone
+from .parsers import RecordParser
 
 
 class PowerDnsRestApiException(Exception):
