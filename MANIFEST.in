@@ -1,2 +1,2 @@
-include *.md VERSION
+include *.py *.md *.txt VERSION
 recursive-include pypdnsrest *.md
