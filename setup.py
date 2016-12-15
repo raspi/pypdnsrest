@@ -1,5 +1,6 @@
 # -*- encoding: utf8 -*-
 
+import logging
 import os
 import subprocess
 from datetime import datetime
@@ -7,11 +8,15 @@ from datetime import datetime
 from setuptools import find_packages
 from setuptools import setup
 
+log = logging.getLogger(__name__)
+
 here = os.path.abspath(os.path.dirname(__file__))
+version_file = os.path.join(here, "VERSION")
 
 __VERSION__ = None
 
 if os.path.isdir(".git"):
+    log.debug("Getting version from git.")
     git_timestamp_cmd = ["git", "log", "-1", "--pretty=format:%at"]
     with subprocess.Popen(git_timestamp_cmd, stdout=subprocess.PIPE) as proc:
         proc.wait(10)
@@ -23,11 +28,12 @@ if os.path.isdir(".git"):
             raise ValueError("Couldn't read commit timestamp. Data: '{0}'".format(out))
 
 if __VERSION__ is not None:
-    with open("VERSION", "w") as f:
+    log.debug("Writing version file '{0}'".format(version_file))
+    with open(version_file, "w") as f:
         f.write(__VERSION__.strip())
 
 if __VERSION__ is None:
-    with open("VERSION", "r") as f:
+    with open(version_file, "r") as f:
         f.readlines().strip()
 
 if __VERSION__ is None or __VERSION__ == "":
