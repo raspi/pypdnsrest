@@ -11,18 +11,27 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 __VERSION__ = None
 
-git_timestamp_cmd = ["git", "log", "-1", "--pretty=format:%at"]
-with subprocess.Popen(git_timestamp_cmd, stdout=subprocess.PIPE) as proc:
-    proc.wait(10)
-    out = proc.stdout.read().strip()
-    try:
-        d = datetime.fromtimestamp(timestamp=float(int(out)))
-        __VERSION__ = "{:%Y.%m.%d.%H%M%S}".format(d)
-    except:
-        raise ValueError("Couldn't read commit timestamp. Data: '{0}'".format(out))
+if os.path.isdir(".git"):
+    git_timestamp_cmd = ["git", "log", "-1", "--pretty=format:%at"]
+    with subprocess.Popen(git_timestamp_cmd, stdout=subprocess.PIPE) as proc:
+        proc.wait(10)
+        out = proc.stdout.read().strip()
+        try:
+            d = datetime.fromtimestamp(timestamp=float(int(out)))
+            __VERSION__ = "{:%Y.%m.%d.%H%M%S}".format(d)
+        except:
+            raise ValueError("Couldn't read commit timestamp. Data: '{0}'".format(out))
+
+if __VERSION__ is not None:
+    with open("VERSION", "w") as f:
+        f.write(__VERSION__.strip())
 
 if __VERSION__ is None:
-    raise ValueError("Version is None.")
+    with open("VERSION", "r") as f:
+        f.readlines().strip()
+
+if __VERSION__ is None or __VERSION__ == "":
+    raise ValueError("Version file couldn't be loaded.")
 
 classifiers = [
     "Development Status :: 3 - Alpha",
