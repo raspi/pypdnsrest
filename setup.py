@@ -1,11 +1,28 @@
 # -*- encoding: utf8 -*-
 
 import os
+import subprocess
+from datetime import datetime
 
 from setuptools import find_packages
 from setuptools import setup
 
 here = os.path.abspath(os.path.dirname(__file__))
+
+__VERSION__ = None
+
+git_timestamp_cmd = ["git", "log", "-1", "--pretty=format:%at"]
+with subprocess.Popen(git_timestamp_cmd, stdout=subprocess.PIPE) as proc:
+    proc.wait(10)
+    out = proc.stdout.read().strip()
+    try:
+        d = datetime.fromtimestamp(timestamp=float(int(out)))
+        __VERSION__ = "{:%Y.%m.%d.%H%M%S}".format(d)
+    except:
+        raise ValueError("Couldn't read commit timestamp. Data: '{0}'".format(out))
+
+if __VERSION__ is None:
+    raise ValueError("Version is None.")
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -32,7 +49,7 @@ testing_extras = tests_require + [
 
 setup(author=u'Pekka Järvinen',
       name='pypdnsrest',
-      version='0.1',
+      version=__VERSION__,
       description='PowerDNS REST API',
       long_description='PowerDNS REST API',
       classifiers=classifiers,
