@@ -16,8 +16,8 @@ from .dnsrecords import InvalidDNSRecordException
 from .dnszone import DNSZone
 from .parsers import RecordParser
 
-
 ParserList = List[RecordParser]
+
 
 class PowerDnsRestApiException(Exception):
     pass
