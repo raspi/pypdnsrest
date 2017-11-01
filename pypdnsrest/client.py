@@ -3,6 +3,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+from typing import List
 from pprint import pprint
 import json
 
@@ -15,6 +16,8 @@ from .dnsrecords import InvalidDNSRecordException
 from .dnszone import DNSZone
 from .parsers import RecordParser
 
+
+ParserList = List[RecordParser]
 
 class PowerDnsRestApiException(Exception):
     pass
@@ -33,6 +36,7 @@ class PowerDnsRestApiClient:
 
     c = Session()
 
+    # Record parsers, can be overridden
     _rec_parsers = []
 
     def __init__(self, apikey: str, protocol: str = u"http", host: str = u"127.0.0.1", port: int = 8081,
@@ -209,12 +213,14 @@ class PowerDnsRestApiClient:
 
         return len(self.get_parsers()) > 0
 
-    def get_parsers(self) -> list:
+    def get_parsers(self) -> ParserList:
         return self._rec_parsers
 
-    def _load_default_parsers(self) -> bool:
+    def _get_default_parsers_list(self) -> ParserList:
         import inspect
         import pypdnsrest.parsers
+
+        default_parsers = []
 
         for name, obj in inspect.getmembers(pypdnsrest.parsers):
             if name.lower().find(u"RecordParser".lower()) == -1:
@@ -222,7 +228,14 @@ class PowerDnsRestApiClient:
             if inspect.isclass(obj) and not inspect.isbuiltin(obj) and object not in obj.__bases__:
                 inst = obj()
                 if isinstance(inst, RecordParser):  # pragma: no cover
-                    self.add_parser(inst)
+                    default_parsers.append(inst)
+
+        return default_parsers
+
+    def _load_default_parsers(self) -> bool:
+
+        for parser in self._get_default_parsers_list():
+            self.add_parser(parser)
 
         if len(self.get_parsers()) == 0:  # pragma: no cover
             raise ImportError(u"Couldn't load default parsers")
@@ -239,6 +252,13 @@ class PowerDnsRestApiClient:
         o = DNSZone()
 
         if len(self.get_parsers()) == 0:
+            # No parsers found, load default parsers.
+            # Custom parsers can be added after init
+            # c = PowerDnsRestApiClient()
+            # c.add_parser(MyOwnAParser)
+            # c.add_parser(MyOwnNsParser)
+            # ...
+            # c.get_zone(...)
             self._load_default_parsers()
 
         for i in zonedata['rrsets']:
