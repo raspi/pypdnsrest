@@ -3,6 +3,10 @@ sudo: required
 
 language: python
 
+env:
+  global:
+   - secure: "exd710KWyVgYpBI+P576PNGBP0SIiyqunxhlMPueSB9E8AUTLxLMhZgGJb7voKWxiEge9ACOvnCWBylAawa3RFGtyV8K7e6/ddU/Pa8WmBNGK56ghl6EOL7L6dVaXaZlEeaoUyBlDMpUJymlLeHrrASiR+B5MJP0wuYvPEXKCgu3kRKIw1jDLSuxvzXYPxggDfIWz383NfJXcGHY5f073CycHiqhRYP0qWeDzP73DEdQuTAYmdZXQZqN6MesGabB4pZ2uhbzgN6Zn379ws3AKsOpWWDfK5r+RoupCCnm49JJ80igmokjNStE71gO1gdYmH5zKsg8ATiGHWxykcR56t3Ys+bK8PSCrQqvy2Coxl5c/pz01q/0n/YO6NBV2yw6aEzlG32qMerb+5UW5yXCASZiRvbR6UwoU7jIcjIhtDI2gcne+48FempWdPecFxuVaQQQ0ReflE3S7E4sUhJA4lkECldXvhw7lXSl2jYyMqP39cf26pSkTrqUJ/Bd2sMqiLuJmBwO934VkoDoBUcYTLUhmoxwBhb1+PjsJeC1bFOmkA8cd3qSt7Vp1LtgKPTyx6P8DG9XBr3YYdrx1kY95nhNWm2sgZTLK5sgePpr397Jt2ldDyWo0XKNzd952HUwKbdDlAY8WRSrr/1mvH0A/895lfa8izUIdQXWmajcb5E="
+
 services:
   - docker
 
@@ -36,6 +40,7 @@ before_script:
     - sudo apt-get -qq update
 
 before_install:
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
   - docker pull raspi/docker-powerdns-travis-ci-rest-test
   - docker run --network host --detach raspi/docker-powerdns-travis-ci-rest-test
   - sudo netstat --listening --protocol inet --numeric
@@ -45,3 +50,12 @@ install:
 
 script:
   - travis_retry tox
+
+addons:
+  coverity_scan:
+    project:
+      name: "raspi/pypdnsrest"
+      description: "Build submitted via Travis CI"
+    build_command_prepend: ""
+    build_command:   ""
+    branch_pattern: coverity_scan
