@@ -202,16 +202,16 @@ class PowerDnsRestApiClient:
         if not isinstance(parser, RecordParser):
             raise TypeError(u"Wrong parser type. RecordParser was expected. '{0}' was given.".format(parsername))
 
-        parsers = self.get_parsers()
         parsernames = []
 
-        for i in parsers:
-            parsernames.append(parsername)
+        for i in self.get_parsers():
+            parsernames.append(type(i).__name__)
 
         if parsername not in parsernames:
             self._rec_parsers.append(parser)
+            return True
 
-        return len(self.get_parsers()) > 0
+        return False
 
     def get_parsers(self) -> ParserList:
         return self._rec_parsers
