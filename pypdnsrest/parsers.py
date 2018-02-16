@@ -34,8 +34,8 @@ class SoaRecordParser(RecordParser):
         tmp = data.split(" ")
         d = DNSSoaRecordData(nameserver=tmp[0], email=tmp[1], serial=int(tmp[2]),
                              refresh=timedelta(seconds=int(tmp[3])),
-                             retry=timedelta(seconds=int(tmp[4])), expire=timedelta(seconds=int(tmp[4])),
-                             ttl=timedelta(seconds=int(tmp[5])))
+                             retry=timedelta(seconds=int(tmp[4])), expire=timedelta(seconds=int(tmp[5])),
+                             ttl=timedelta(seconds=int(tmp[6])))
         rec = DNSSoaRecord(name, timedelta(seconds=ttl))
         rec.set_data(d)
         return rec
