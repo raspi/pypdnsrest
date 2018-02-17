@@ -1,5 +1,11 @@
 engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
 
+plugins:
   pep8:
     enabled: true
     checks:
@@ -10,21 +16,19 @@ engines:
       E501:
         enabled: false
 
-  duplication:
-    enabled: true
-    config:
-      languages:
-      - python
-
-  fixme:
-    enabled: true
-
   radon:
     enabled: true
 
+  fixme:
+    enabled: true
+    
+  markdownlint:
+    enabled: true
+    
+
 ratings:
   paths:
-  - "**.py"
+  - "pypdnsrest/*.py"
 
 exclude_paths:
   - "tests/"
