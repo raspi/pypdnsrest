@@ -41,7 +41,7 @@ class TestApiParsers(unittest.TestCase):
     def test_parser2(self):
         from pypdnsrest.parsers import ARecordParser
         self.api.add_parser(ARecordParser())
-        self.assertTrue(self.api.add_parser(ARecordParser()))
+        self.assertFalse(self.api.add_parser(ARecordParser()))
 
     def test_parser_invalid(self):
         with self.assertRaises(TypeError) as context:

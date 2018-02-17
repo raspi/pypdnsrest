@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 import logging
+from json import JSONDecodeError
 
 log = logging.getLogger(__name__)
 
@@ -7,7 +8,7 @@ from typing import List
 from pprint import pprint
 import json
 
-from requests import Session
+from requests import Session, RequestException
 from requests.models import Response
 from requests.models import PreparedRequest
 
@@ -67,36 +68,13 @@ class PowerDnsRestApiClient:
         o += u"{0}\n".format(body)
         return o
 
-    def _response_to_str(self, res: Response) -> str:
-        o = u"-- RESPONSE ({0}):\n".format(res.status_code)
-        o += u"{0}\n".format(pprint(res.headers))
-
-        jsondata = None
-
-        try:
-            jsondata = res.json()
-        except:
-            pass
-
-        if jsondata is not None:
-            o += u"{0}\n".format(json.dumps(jsondata, indent=4))
-        else:
-            o += u"{0}\n".format(res.content)
-
-        return o
-
     def _hook_response(self, response: Response, *args, **kw):
-        o = "\n{0}".format(self._request_to_str(response.request))
-        o += "\n{0}".format(self._response_to_str(response))
-
-        o += "\n"
-
-        log.debug(o)
-
         if response.status_code >= 400:
             try:
                 err = json.dumps(response.json(), indent=4)
-            except:
+            except JSONDecodeError:
+                err = response.raw
+            except RequestException:
                 err = getattr(response, "content", None)
 
             if err is None:  # pragma: no cover

@@ -10,7 +10,7 @@ from pypdnsrest.dnszone import DNSZone
 
 class TestZone(unittest.TestCase):
     def setUp(self):
-        self.zone = u"{0}.zone.".format(type(self).__name__.lower())
+        self.zone = u"{0}-unittest.zone.".format(type(self).__name__.lower())
 
     def test_add_a_record(self):
         from pypdnsrest.dnsrecords import DNSARecord
