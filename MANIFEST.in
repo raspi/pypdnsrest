@@ -1,2 +1,3 @@
-include *.py *.md *.txt VERSION
-recursive-include pypdnsrest *.md
+include *.md *.txt VERSION
+prune tests
+prune tests_integration
